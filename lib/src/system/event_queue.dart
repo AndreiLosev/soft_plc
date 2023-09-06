@@ -20,14 +20,12 @@ class EventQueue {
         
         while (_run && _queue.isNotEmpty) {
             try {
-                yield await Future.delayed(Duration.zero, _queue.removeFirst);
+                yield await Future(_queue.removeFirst);
             } on StateError {
-                await Future.delayed(Duration.zero);
-                continue;
+                await Future.delayed(Duration(milliseconds: 25));
             } catch (e) {
                 _errorLogger.log(e);
-                await Future.delayed(Duration.zero);
-                continue;
+                await Future.delayed(Duration(milliseconds: 25));
             }
         }
     }
