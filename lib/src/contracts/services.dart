@@ -1,19 +1,25 @@
 abstract interface class IReatainService {
 
-    Future<void> createIfNotExists(String name, dynamic value);
+    Future<void> createIfNotExists(String name, Object value);
 
-    Future<void> update(String name, dynamic value);
+    Future<void> update(String name, Object value);
 
-    Future<Map<String, dynamic>> select(Iterable<String> names);
+    Future<Map<String, Object>> select(Iterable<String> names);
 
 }
 
 abstract interface class IErrorLogger {
     Future<void> build();
-    Future<void> log(Object e, [bool $isFatal = false]);
+    Future<void> log(Object e, Object s, [bool $isFatal = false]);
 }
 
 abstract interface class ILoggingService {
 
-    Future<void> setLog(Map<String, dynamic> property);
+    Future<void> build();
+
+    Future<void> setLog(Map<String, Object> property);
+}
+
+abstract interface class  IUsesDatabase {
+    String get table;
 }

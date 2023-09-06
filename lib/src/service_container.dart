@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 class ServiceContainer {
     final _container = GetIt.asNewInstance();
 
-    T get<T extends Object>({String? id, dynamic param}) =>
+    T get<T extends Object>({String? id, Object? param}) =>
         _container<T>(instanceName: id, param1: param);
 
     void registerSingleton<T extends Object>(

@@ -39,8 +39,8 @@ class PeriodicTaskField {
                     await _retainHeandler.save(_task as IRetainProperty);
                 }
                 
-            } catch (e) {
-                _errorLogger.log(e);
+            } catch (e, s) {
+                _errorLogger.log(e, s);
             }
             await Future.delayed(_getPause());
         }
@@ -52,6 +52,6 @@ class PeriodicTaskField {
 
     Duration _getPause() {
         final timeLeft = DateTime.now().difference(_lastStart);
-        return _task.getPeriod() - timeLeft;
+        return _task.period - timeLeft;
     }
 }

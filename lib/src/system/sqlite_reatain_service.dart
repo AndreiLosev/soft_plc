@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:soft_plc/src/contracts/services.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-class DefaultReatainService implements IReatainService {
+class SqliteReatainService implements IReatainService, IUsesDatabase {
 
     static const String _name = "name";
     static const String _value = "value";
@@ -13,7 +13,15 @@ class DefaultReatainService implements IReatainService {
     late final PreparedStatement _updateStmt;
     bool _init = false;
 
-    DefaultReatainService(this._db) {
+    SqliteReatainService(this._db);
+
+    @override
+    String get table => 'retain_property';
+
+    @override
+    Future<void> createIfNotExists(String name, Object value) {
+        _createTable();
+
         _updateStmt = _db.prepare(
             '''
                 UPDATE $table
@@ -21,15 +29,8 @@ class DefaultReatainService implements IReatainService {
                 WHERE $_name = ? AND $_value != ? ;
             '''
         );
-    }
-
-    String get table => 'retain_property';
-
-    @override
-    Future<void> createIfNotExists(String name, dynamic value) {
-        _createTable();
         
-        final strValue = JsonEncoder(value);
+        final strValue = jsonEncode(value);
 
         var sql = '''
             SELECT * from $table
@@ -53,12 +54,12 @@ class DefaultReatainService implements IReatainService {
     }
 
     @override
-    Future<Map<String, dynamic>> select(Iterable<String> names) {
+    Future<Map<String, Object>> select(Iterable<String> names) {
 
         final keys = names.map((e) => "'$e").join(",");
         final sql = "SELECT * from {$this->table} WHERE name in ({$keys})";
         final dbResult = _db.select(sql);
-        final result = {} as Map<String, dynamic>;
+        final result = {} as Map<String, Object>;
 
         for (Row row in dbResult) {
             result[row[_name]] = jsonDecode(row[_value]);
@@ -68,7 +69,7 @@ class DefaultReatainService implements IReatainService {
     }
 
     @override
-    Future<void> update(String name, dynamic value) {
+    Future<void> update(String name, Object value) {
         
         final strValue = jsonEncode(value);
         _updateStmt.execute([strValue, name, strValue]);

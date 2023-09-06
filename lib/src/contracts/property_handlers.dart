@@ -1,22 +1,24 @@
+import 'package:soft_plc/src/contracts/task.dart';
+
 abstract interface class IRetainProperty {
     
-    Map<String, dynamic> getRetainProperty();
-    void setRetainProperties(Map<String, dynamic> properties);
+    Map<String, Object> getRetainProperty();
+    void setRetainProperties(Map<String, Object> properties);
 }
 
 abstract interface class ILoggingProperty {
     
-    Map<String, dynamic> getLoggingProperty();
+    Map<String, Object> getLoggingProperty();
 }
 
 abstract interface class IMonitoringProperty {
     
-    Map<String, dynamic> getEventValues();
+    List<(Event, Object)> getEventValues();
     bool floatIsEquals(double a, double b);
 }
 
 abstract interface class INetworkProperty {
 
-    Map<String, dynamic> getNetworkProperty();
-    void setNetworkProperty(Map<String, dynamic> properties);
+    Map<String, Object> getNetworkProperty();
+    void setNetworkProperty(Map<String, Object> properties);
 }

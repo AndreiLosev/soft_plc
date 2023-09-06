@@ -25,23 +25,23 @@ class EventTaskField {
         }
     }
 
-    bool match(String eventName)
+    bool match(Event event)
     {
-        return _task.getEvent() == eventName;
+        return _task.eventSubscriptions.contains(event.name);
     }
 
-    Future<void> run(ServiceContainer container) async {
+    Future<void> run(ServiceContainer container, Event event) async {
 
         while (_run) {
             try {
-                _task.execute(container);
+                _task.execute(container, event);
                 
                 if (_task is IRetainProperty) {
                     await _retainHeandler.save(_task as IRetainProperty);
                 }
                 
-            } catch (e) {
-                _errorLogger.log(e);
+            } catch (e, s) {
+                _errorLogger.log(e, s);
             }
         }
     }
