@@ -77,6 +77,9 @@ class SoftPlcBuilder {
             throw Exception("unregistered more than one task");
         }
 
+        final periodicTaskFields = <PeriodicTaskField>[];
+        final eventTasls = <EventTaskField>[];
+
         for (final t in _tasks) {
             if (t is ILoggingService) {
                 _loggingTasks.add(t as ILoggingProperty);
@@ -90,8 +93,6 @@ class SoftPlcBuilder {
                 _networkTask.add(t as INetworkProperty);
             }
 
-            final periodicTaskFields = <PeriodicTaskField>[];
-
             if (t is PeriodicTask) {
                 periodicTaskFields.add(PeriodicTaskField(
                     t,
@@ -100,10 +101,6 @@ class SoftPlcBuilder {
                 ));
             }
 
-            _periodicTaskCollection = PeriodicTaskCollection(periodicTaskFields);
-
-            final eventTasls = <EventTaskField>[];
-
             if (t is EventTask) {
                 eventTasls.add(EventTaskField(
                     t,
@@ -111,12 +108,14 @@ class SoftPlcBuilder {
                     _container.get<IErrorLogger>(),
                 ));
             }
-
-            _eventTaskCollection = EventTaskCollection(
-                eventTasls,
-                _container.get<EventQueue>(),
-            );
         }
+
+        _periodicTaskCollection = PeriodicTaskCollection(periodicTaskFields);
+        _eventTaskCollection = EventTaskCollection(
+            eventTasls,
+            _container.get<EventQueue>(),
+        );
+
     }
 
     void _registerDefaultServices() {

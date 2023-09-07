@@ -11,7 +11,6 @@ class EventTaskField {
     final EventTask _task;
     final RetainPropertyHeandler _retainHeandler;
     final IErrorLogger _errorLogger;
-    bool _run = false;
 
     EventTaskField(
         this._task,
@@ -27,26 +26,20 @@ class EventTaskField {
 
     bool match(Event event)
     {
-        return _task.eventSubscriptions.contains(event.name);
+        return _task.eventSubscriptions.contains(event.runtimeType);
     }
 
     Future<void> run(ServiceContainer container, Event event) async {
 
-        while (_run) {
-            try {
-                _task.execute(container, event);
-                
-                if (_task is IRetainProperty) {
-                    await _retainHeandler.save(_task as IRetainProperty);
-                }
-                
-            } catch (e, s) {
-                _errorLogger.log(e, s);
+        try {
+            _task.execute(container, event);
+            
+            if (_task is IRetainProperty) {
+                await _retainHeandler.save(_task as IRetainProperty);
             }
+            
+        } catch (e, s) {
+            _errorLogger.log(e, s);
         }
-    }
-
-     void cancel() {
-        _run = false;
     }
 }

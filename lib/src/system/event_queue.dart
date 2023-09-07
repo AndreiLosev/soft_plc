@@ -19,9 +19,10 @@ class EventQueue {
 
     Stream<Event> listen() async* {
         
-        while (_run && _queue.isNotEmpty) {
+        while (_run || _queue.isNotEmpty) {
             try {
-                yield await Future(_queue.removeFirst);
+                final e = _queue.removeFirst();
+                yield await Future.delayed(Duration.zero,() => e);
             } on StateError {
                 await Future.delayed(Duration(milliseconds: 25));
             } catch (e, s) {

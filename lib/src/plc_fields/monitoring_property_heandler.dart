@@ -71,5 +71,5 @@ class MonitoringPropertyHeandler {
         return !(oldValue == value);
     }
 
-    String _getKey(Event event, int id) => "${event.name}_$id";
+    String _getKey(Event event, int id) => "${event.runtimeType}_$id";
 }

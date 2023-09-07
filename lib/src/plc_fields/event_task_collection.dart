@@ -22,6 +22,7 @@ class EventTaskCollection {
     Future<void> run(ServiceContainer container) async {
 
         await for (Event event in _eventQueue.listen()) {
+
             try {
                 final launchTasks = _tasks.where((t) => t.match(event));
                 await Future.wait(launchTasks.map((e) => e.run(container, event)));
