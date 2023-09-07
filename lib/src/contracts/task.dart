@@ -16,6 +16,4 @@ abstract class EventTask<T extends Event> extends Task {
 
 }
 
-abstract class Event {
-    String get name => runtimeType.toString();
-}
+abstract class Event {}

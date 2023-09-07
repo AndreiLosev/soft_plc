@@ -15,6 +15,9 @@ class LoggingPropertyHeandler {
         Config config,
     ): _period = config.loggingPeriod;
 
+    Future<void> build() async {
+        await _loggingService.build();
+    }
 
     Future<void> run() async {
     

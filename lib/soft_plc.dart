@@ -1,5 +1,6 @@
 library soft_plc;
 
+export 'src/soft_plc.dart';
 export 'src/soft_plc_builder.dart';
 export 'src/config.dart';
 export 'src/constatns.dart';
