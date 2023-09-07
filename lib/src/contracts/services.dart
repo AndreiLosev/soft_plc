@@ -10,7 +10,7 @@ abstract interface class IReatainService {
 
 abstract interface class IErrorLogger {
     Future<void> build();
-    Future<void> log(Object e, Object s, [bool $isFatal = false]);
+    Future<void> log(Object e, StackTrace s, [bool $isFatal = false]);
 }
 
 abstract interface class ILoggingService {
@@ -20,6 +20,17 @@ abstract interface class ILoggingService {
     Future<void> setLog(Map<String, Object> property);
 }
 
-abstract interface class  IUsesDatabase {
+abstract interface class IUsesDatabase {
     String get table;
+}
+
+typedef DbRow = Map<String, Object?>;
+
+abstract interface class IDbConnect {
+    Future<void> execute(String sql, [List<Object?> params = const []]);
+
+    Future<List<DbRow>> select(
+        String sql, [
+        List<Object?> params = const [],
+    ]);
 }

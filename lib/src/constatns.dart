@@ -1,1 +1,1 @@
-const cancelEvent = 'SYSTEM_CANCEL';
+const defaultDatabase = 'default_sqlite3';

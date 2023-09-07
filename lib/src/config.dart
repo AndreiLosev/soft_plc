@@ -1,8 +1,11 @@
+import 'package:soft_plc/soft_plc.dart';
+
 class Config {
     
-    final loggingPeriod = Duration(minutes: 10);
+    Duration get loggingPeriod => Duration(minutes: 10);
 
-    final bool useDefaultSqlite3 = true;
+    String get database => defaultDatabase;
+    String get sqlitePath => 'soft_pls.db'; 
 
     bool floatIsEquals(double a, double b) =>
         (a - b).abs() < 0.1;

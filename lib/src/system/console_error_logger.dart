@@ -6,7 +6,7 @@ class ConsoleErrorLogger implements IErrorLogger {
     Future<void> build() => Future.value();
 
     @override
-    Future<void> log(Object e, Object s, [bool $isFatal = false]) {
+    Future<void> log(Object e, StackTrace s, [bool $isFatal = false]) {
         print(e);
         print(s);
         return Future.value();

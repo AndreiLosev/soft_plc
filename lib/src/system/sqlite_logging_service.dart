@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:soft_plc/src/contracts/services.dart';
 import 'package:soft_plc/src/helpers/mixins.dart';
-import 'package:sqlite3/sqlite3.dart';
 
 class SqliteLoggingLervice with CreatedAt implements ILoggingService, IUsesDatabase {
 
@@ -11,7 +10,7 @@ class SqliteLoggingLervice with CreatedAt implements ILoggingService, IUsesDatab
     static const _value = 'value';
     static const _createdAt = 'created_at';
 
-    final Database _db;
+    final IDbConnect _db;
 
     SqliteLoggingLervice(this._db);
 
@@ -35,7 +34,7 @@ class SqliteLoggingLervice with CreatedAt implements ILoggingService, IUsesDatab
     }
 
     @override
-    Future<void> setLog(Map<String, Object> property) {
+    Future<void> setLog(Map<String, Object> property) async {
 
         final sqlB = StringBuffer('''
             INSERT INTO $table ($_name, $_value, $_createdAt)
@@ -44,16 +43,17 @@ class SqliteLoggingLervice with CreatedAt implements ILoggingService, IUsesDatab
         
         for (var item in property.entries) {
             final strValue = jsonEncode(item.value);
-            sqlB.write("('${item.key}','$strValue',{$createdAt}),");
+            sqlB.write("('${item.key}','$strValue','$createdAt'),");
         }
 
         var sql = sqlB.toString();
         sql = sql.substring(0, sql.length - 1);
         sql = "$sql;";
 
-        _db.execute(sql);
+        print(sql);
+
+        await _db.execute(sql);
 
         return Future.value();
     }
-
 }
