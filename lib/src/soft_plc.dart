@@ -37,4 +37,8 @@ class SoftPlc {
             _container.get<IErrorLogger>().log(e, s, true);
         }
     }
+
+    void dispatchEvent(Event event) =>
+        _container.get<EventQueue>().dispatch(event);
+
 }
