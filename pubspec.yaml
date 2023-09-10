@@ -9,8 +9,7 @@ environment:
 # Add regular dependencies here.
 dependencies:
   get_it: ^7.6.4
-  isar: ^3.1.0+1
-  mqtt_client: ^10.0.0
+  sqlite3: ^2.1.0
   # path: ^1.8.0
 
 dev_dependencies:

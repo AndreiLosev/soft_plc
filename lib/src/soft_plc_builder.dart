@@ -9,6 +9,7 @@ import 'package:soft_plc/src/plc_fields/network_property_heandler.dart';
 import 'package:soft_plc/src/plc_fields/periodic_task_collection.dart';
 import 'package:soft_plc/src/plc_fields/periodic_task_field.dart';
 import 'package:soft_plc/src/plc_fields/retain_property_heandler.dart';
+import 'package:soft_plc/src/system/sqlite_db_connect.dart';
 
 class SoftPlcBuilder {
 
@@ -123,17 +124,25 @@ class SoftPlcBuilder {
             _container.registerSingleton<Config>(Config());
         }
 
-        // if (!_container.has<IReatainService>()) {
-        //     _container.registerSingleton<IReatainService>(SqliteReatainService(
-        //         _container.get<IDbConnect>(),
-        //     ));
-        // }
+        final useDefaultDatabase = _container.get<Config>().database == defaultDatabase;
 
-        // if (!_container.has<ILoggingService>()) {
-        //     _container.registerSingleton<ILoggingService>(SqliteLoggingLervice(
-        //         _container.get<IDbConnect>(),
-        //     ));
-        // }
+        if (!_container.has<IDbConnect>() && useDefaultDatabase) {
+            _container.registerSingleton<IDbConnect>(SqliteDbConnect(
+                _container.get<Config>().sqlitePath,
+            ));
+        }
+
+        if (!_container.has<IReatainService>()) {
+            _container.registerSingleton<IReatainService>(SqliteReatainService(
+                _container.get<IDbConnect>(),
+            ));
+        }
+
+        if (!_container.has<ILoggingService>()) {
+            _container.registerSingleton<ILoggingService>(SqliteLoggingLervice(
+                _container.get<IDbConnect>(),
+            ));
+        }
 
         if (!_container.has<IErrorLogger>()) {
             _container.registerSingleton<IErrorLogger>(ConsoleErrorLogger());
@@ -159,11 +168,10 @@ class SoftPlcBuilder {
             _container.get<EventQueue>(),
         );
 
-        // _networkPropertyHeandler = NetworkPropertyHeandler(
-        //     _networkTask,
-        //     _container.get<Config>().mqttConfig,
-        //     _container.get<IErrorLogger>(),
-        // );
+        _networkPropertyHeandler = NetworkPropertyHeandler(
+            _networkTask,
+            _container.get<Config>(),
+        );
 
         await Future.wait([
             _loggingPropertyHeandler.build(),

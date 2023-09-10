@@ -23,3 +23,14 @@ abstract interface class ILoggingService {
 abstract interface class IUsesDatabase {
     String get table;
 }
+
+typedef DbRow = Map<String, Object?>;
+
+abstract interface class IDbConnect {
+    Future<void> execute(String sql, [List<Object?> params = const []]);
+
+    Future<List<DbRow>> select(
+        String sql, [
+        List<Object?> params = const [],
+    ]);
+}
