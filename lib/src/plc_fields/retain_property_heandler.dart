@@ -12,7 +12,7 @@ class RetainPropertyHeandler {
             await _reatainService.createIfNotExists(name, value)
         );
 
-        final restoredProeprty = await _reatainService.select(retainProperty.keys);
+        final restoredProeprty = await _reatainService.select(retainProperty.keys.toSet());
 
         task.setRetainProperties(restoredProeprty);
     }

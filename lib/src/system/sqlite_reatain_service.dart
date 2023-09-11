@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:soft_plc/src/contracts/services.dart';
+import 'package:soft_plc/src/helpers/reatain_value.dart';
 
 class SqliteReatainService implements IReatainService, IUsesDatabase {
 
@@ -8,7 +7,9 @@ class SqliteReatainService implements IReatainService, IUsesDatabase {
     static const String _value = "value";
 
     final IDbConnect _db;
-    late final String _updateSql; 
+    late final String _updateSql;
+
+    final _values = <String, ReatainValue>{};
 
     bool _init = false;
 
@@ -24,10 +25,12 @@ class SqliteReatainService implements IReatainService, IUsesDatabase {
     String get table => 'retain_property';
 
     @override
-    Future<void> createIfNotExists(String name, Object value) async {
+    Future<void> createIfNotExists(String name, ReatainValue value) async {
         _createTable();
+
+        _values[name] = value;
         
-        final strValue = jsonEncode(value);
+        final strValue = value.toJson();
 
         var sql = '''
             SELECT * from $table
@@ -49,24 +52,27 @@ class SqliteReatainService implements IReatainService, IUsesDatabase {
     }
 
     @override
-    Future<Map<String, Object>> select(Iterable<String> names) async {
+    Future<Map<String, ReatainValue>> select(Set<String> names) async {
 
         final keys = names.map((e) => "'$e").join(",");
         final sql = "SELECT * from {$this->table} WHERE name in ({$keys})";
         final dbResult = await _db.select(sql);
-        final result = {} as Map<String, Object>;
+        final result = {} as Map<String, ReatainValue<Object>>;
 
         for (final row in dbResult) {
-            result[row[_name] as String] = jsonDecode(row[_value] as String);
+            final name = row[_name] as String;
+            final strValue = row[_value] as String;
+            _values[name]?.fromJson(strValue);
+            result[name] = _values[_name]!;
         }
 
         return Future.value(result);
     }
 
     @override
-    Future<void> update(String name, Object value) async {
+    Future<void> update(String name, ReatainValue value) async {
         
-        final strValue = jsonEncode(value);
+        final strValue = value.toJson();
 
         await _db.execute(_updateSql, [strValue, name, strValue]);
     }

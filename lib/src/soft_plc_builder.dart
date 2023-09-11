@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:soft_plc/soft_plc.dart';
+import 'package:soft_plc/src/configs/mqtt_config.dart';
+import 'package:soft_plc/src/helpers/system_tasks.dart';
 import 'package:soft_plc/src/plc_fields/event_task_collection.dart';
 import 'package:soft_plc/src/plc_fields/event_task_field.dart';
 import 'package:soft_plc/src/plc_fields/logging_property_heandler.dart';
@@ -59,6 +61,7 @@ class SoftPlcBuilder {
 
     Future<SoftPlc> build() async {
         _registerDefaultServices();
+        _registerSystemTasks();
         _setTaskTypes();
         await _createHeandlers();
 
@@ -118,10 +121,20 @@ class SoftPlcBuilder {
 
     }
 
+    void _registerSystemTasks() {
+        registerTask(PublishMessageTask());
+    }
+
     void _registerDefaultServices() {
 
+        if (!_container.has<MqttConfig>()) {
+            _container.registerSingleton(MqttConfig());
+        }
+
         if (!_container.has<Config>()) {
-            _container.registerSingleton<Config>(Config());
+            _container.registerSingleton<Config>(Config(
+                _container.get<MqttConfig>(),
+            ));
         }
 
         final useDefaultDatabase = _container.get<Config>().database == defaultDatabase;
@@ -170,7 +183,8 @@ class SoftPlcBuilder {
 
         _networkPropertyHeandler = NetworkPropertyHeandler(
             _networkTask,
-            _container.get<Config>(),
+            _container.get<Config>().mqttConfig,
+            _container.get<IErrorLogger>(),
         );
 
         await Future.wait([
@@ -181,6 +195,5 @@ class SoftPlcBuilder {
             _eventTaskCollection.build(),
 
         ]);
-    }    
-
+    }
 }

@@ -11,7 +11,7 @@ abstract class PeriodicTask extends Task {
 }
 
 abstract class EventTask<T extends Event> extends Task {
-    Set<Type> get eventSubscriptions;
+    Set<Type> get eventSubscriptions => {T};
     void execute(ServiceContainer container, T event);
 
 }

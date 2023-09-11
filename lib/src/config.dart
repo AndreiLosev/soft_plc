@@ -1,6 +1,11 @@
 import 'package:soft_plc/soft_plc.dart';
+import 'package:soft_plc/src/configs/mqtt_config.dart';
 
 class Config {
+
+    final MqttConfig mqttConfig;
+
+    Config(this.mqttConfig);
     
     Duration get loggingPeriod => Duration(minutes: 10);
 

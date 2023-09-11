@@ -1,16 +1,18 @@
+import 'package:soft_plc/src/helpers/reatain_value.dart';
+
 abstract interface class IReatainService {
 
-    Future<void> createIfNotExists(String name, Object value);
+    Future<void> createIfNotExists(String name, ReatainValue value);
 
-    Future<void> update(String name, Object value);
+    Future<void> update(String name, ReatainValue value);
 
-    Future<Map<String, Object>> select(Iterable<String> names);
+    Future<Map<String, ReatainValue>> select(Set<String> names);
 
 }
 
 abstract interface class IErrorLogger {
     Future<void> build();
-    Future<void> log(Object e, StackTrace s, [bool $isFatal = false]);
+    Future<void> log(Object e, StackTrace s, [bool isFatal = false]);
 }
 
 abstract interface class ILoggingService {

@@ -1,9 +1,13 @@
+
 import 'package:soft_plc/src/contracts/task.dart';
+import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
+import 'package:soft_plc/src/helpers/reatain_value.dart';
+import 'package:typed_data/typed_data.dart';
 
 abstract interface class IRetainProperty {
     
-    Map<String, Object> getRetainProperty();
-    void setRetainProperties(Map<String, Object> properties);
+    Map<String, ReatainValue> getRetainProperty();
+    void setRetainProperties(Map<String, ReatainValue> properties);
 }
 
 abstract interface class ILoggingProperty {
@@ -19,6 +23,7 @@ abstract interface class IMonitoringProperty {
 
 abstract interface class INetworkProperty {
 
-    Map<String, Object> getNetworkProperty();
-    void setNetworkProperty(Map<String, Object> properties);
+    Set<String> getTopicSubscriptions();
+    void setNetworkProperty(String topic, MqttPayloadBuilder value);
+    Map<String, MqttPayloadBuilder> getPeriodicallyPublishedValues();
 }

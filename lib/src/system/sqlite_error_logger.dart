@@ -1,6 +1,5 @@
 import 'package:soft_plc/src/contracts/services.dart';
 import 'package:soft_plc/src/helpers/mixins.dart';
-import 'package:sqlite3/sqlite3.dart';
 
 class SqliteErrorLogger with CreatedAt implements IErrorLogger, IUsesDatabase {
     
