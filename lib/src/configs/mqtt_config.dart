@@ -12,7 +12,7 @@ class MqttConfig {
     Duration get keepAlivePeriod => Duration(minutes: 5);
     Duration get connectTimeoutPeriod => Duration(seconds: 2);
 
-    bool get logging => true;
+    bool get logging => false;
 
     bool get autoReconnect => true;
 

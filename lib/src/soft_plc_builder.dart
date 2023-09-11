@@ -26,14 +26,12 @@ class SoftPlcBuilder {
     late final PeriodicTaskCollection _periodicTaskCollection;
     late final EventTaskCollection _eventTaskCollection;
 
-    SoftPlcBuilder registerTask<T extends Task>(T task) {
+    void registerTask<T extends Task>(T task) {
         _tasks.add(task);
         _container.registerSingleton(() => task);
-
-        return this;
     }
 
-    SoftPlcBuilder registerSingleton<T extends Object>(
+    void registerSingleton<T extends Object>(
         T instance, {
         String? scope,
         FutureOr<void> Function(T service)? dispose,
@@ -43,11 +41,9 @@ class SoftPlcBuilder {
             dispose: dispose,
             scope: scope,
         );
-
-        return this;
     }
 
-    SoftPlcBuilder registerFactory<T extends Object, P1>(
+    void registerFactory<T extends Object, P1>(
         T Function(P1 param1) create,
         {String? scope}
     ) {
@@ -55,8 +51,6 @@ class SoftPlcBuilder {
             (param) => create(param),
             scope: scope,
         );
-
-        return this;
     }
 
     Future<SoftPlc> build() async {

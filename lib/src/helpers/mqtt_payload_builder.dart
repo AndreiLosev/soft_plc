@@ -39,20 +39,6 @@ class MqttPayloadBuilder {
     }
 
     void addString(String val) {
-        addUTF16String(val);
-    }
-
-    void addUTF16String(String val) {
-        for (final codeUnit in val.codeUnits) {
-            if (codeUnit <= 0xff && codeUnit >= 0) {
-                _payload.add(codeUnit);
-            } else {
-                addUint16(codeUnit);
-            }
-        }
-    }
-
-    void addUTF8String(String val) {
         const encoder = Utf8Encoder();
         _payload.addAll(encoder.convert(val));
     }
@@ -71,19 +57,11 @@ class MqttPayloadBuilder {
         _payload.clear();
     }
 
-    String getAsUTF8String([int? length]) {
+    String getAsString([int? length]) {
         final slice = _sliceFromBuffer(length);        
         const decoder = Utf8Decoder();
 
         return decoder.convert(slice);
-    }
-
-    String getAsUTF16String([int? length]) {
-        final slice = _sliceFromBuffer(length);
-        final sb = StringBuffer();
-        slice.forEach(sb.writeCharCode);
-
-        return sb.toString();
     }
 
     int getAsUint64() {
@@ -126,16 +104,15 @@ class MqttPayloadBuilder {
 
     Uint8Buffer _sliceFromBuffer(int? length) {
         
-        final slice = Uint8Buffer();
 
         final len = length ?? _payload.length;
+        final slice = Uint8Buffer(len);
 
         for (var i = 0; i < len; i++) {
             final byte = _payload.removeLast();
-            slice.add(byte);
+            slice[len - i - 1] = byte;
         }
 
-        return slice;
-
+            return slice;
     }
 }
