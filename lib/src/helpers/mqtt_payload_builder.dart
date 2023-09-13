@@ -57,6 +57,11 @@ class MqttPayloadBuilder {
         _payload.clear();
     }
 
+    bool getAsBool() {
+        final slice = _sliceFromBuffer(1);
+        return slice.first > 0;
+    }
+
     String getAsString([int? length]) {
         final slice = _sliceFromBuffer(length);        
         const decoder = Utf8Decoder();
@@ -100,6 +105,16 @@ class MqttPayloadBuilder {
 
     int getAsInt8() {
         return _sliceFromBuffer(1).first;
+    }
+
+    double getAsFloat() {
+        final slice = _sliceFromBuffer(4);
+        return slice.buffer.asFloat32List().first;
+    }
+
+    double getAsDouble() {
+        final slice = _sliceFromBuffer(8);
+        return slice.buffer.asFloat64List().first;
     }
 
     Uint8Buffer _sliceFromBuffer(int? length) {
