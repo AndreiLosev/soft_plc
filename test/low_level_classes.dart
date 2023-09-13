@@ -1,6 +1,7 @@
 library low_level_classes_test;
 
 import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
+import 'package:soft_plc/src/helpers/reatain_value.dart';
 import 'package:test/test.dart';
 import 'package:typed_data/typed_data.dart';
 
@@ -39,5 +40,27 @@ void main() {
         expectLater(true, builder.getAsBool());
         expectLater(66, builder.getAsUint8());
 
+    });
+
+    test("retain_value", () {
+        final b = ReatainBoolValue(true);
+        expectLater('true', b.toJson());
+        b.fromJson('false');
+        expectLater(false, b.value);
+
+        final n = ReatainNumValue(620);
+        expectLater('620', n.toJson());
+        n.fromJson('7777');
+        expectLater(7777, n.value);
+
+        final m = ReatainMapValue({"one": 1.22, 'two': 33});
+        expectLater('{"one":1.22,"two":33}', m.toJson());
+        m.fromJson('{"one":13.22,"two":33.33}');
+        expectLater(<String, num>{"one": 13.22, "two": 33.33}, m.value);
+
+        final l = ReatainListValue([true, false, true]);
+        expectLater("[true,false,true]", l.toJson());
+        l.fromJson("[true,true,false]");
+        expectLater([true, true, false], l.value);
     });
 }
