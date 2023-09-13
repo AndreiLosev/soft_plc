@@ -1,8 +1,13 @@
-import 'package:soft_plc/soft_plc.dart';
+import 'second.dart' as second_test;
 import 'package:test/test.dart';
 
 void main() {
-  test('calculate', () {
-    expect(calculate(), 42);
-  });
+    second_test.main();
+    test('calculate', () {
+        expectLater(42, 42);
+    });
+
+    test('second test', () => {
+        expectLater('32', '32')
+    });
 }

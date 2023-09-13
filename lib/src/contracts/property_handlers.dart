@@ -2,7 +2,6 @@
 import 'package:soft_plc/src/contracts/task.dart';
 import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
 import 'package:soft_plc/src/helpers/reatain_value.dart';
-import 'package:typed_data/typed_data.dart';
 
 abstract interface class IRetainProperty {
     
