@@ -1,5 +1,7 @@
-import 'low_level_classes.dart' as low_level;
+import 'helpers_classes_test.dart' as helpers;
+import 'system_whith_db_test.dart' as sqliete;
 
 void main() {
-    low_level.main();
+    helpers.main();
+    sqliete.main();
 }
