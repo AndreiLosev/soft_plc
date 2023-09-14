@@ -54,16 +54,16 @@ class SqliteReatainService implements IReatainService, IUsesDatabase {
     @override
     Future<Map<String, ReatainValue>> select(Set<String> names) async {
 
-        final keys = names.map((e) => "'$e").join(",");
-        final sql = "SELECT * from {$this->table} WHERE name in ({$keys})";
+        final keys = names.map((e) => "'$e'").join(",");
+        final sql = "SELECT * from $table WHERE name in ($keys)";
         final dbResult = await _db.select(sql);
-        final result = {} as Map<String, ReatainValue<Object>>;
+        final result = <String, ReatainValue>{};
 
         for (final row in dbResult) {
             final name = row[_name] as String;
             final strValue = row[_value] as String;
             _values[name]?.fromJson(strValue);
-            result[name] = _values[_name]!;
+            result[name] = _values[name]!;
         }
 
         return Future.value(result);

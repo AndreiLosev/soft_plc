@@ -36,23 +36,19 @@ class SqliteLoggingLervice with CreatedAt implements ILoggingService, IUsesDatab
     @override
     Future<void> setLog(Map<String, Object> property) async {
 
-        final sqlB = StringBuffer('''
-            INSERT INTO $table ($_name, $_value, $_createdAt)
-            VALUES
-        ''');
-        
+        final sqlB = StringBuffer(
+            "INSERT INTO $table ($_name, $_value, $_createdAt) VALUES ",
+        );
+ 
+        var i = 0;
         for (var item in property.entries) {
             final strValue = jsonEncode(item.value);
-            sqlB.write("('${item.key}','$strValue','$createdAt'),");
+            sqlB.write("('${item.key}','$strValue','$createdAt')");
+            i += 1;
+            sqlB.write(i == property.entries.length ? ';' : ',');
         }
 
-        var sql = sqlB.toString();
-        sql = sql.substring(0, sql.length - 1);
-        sql = "$sql;";
-
-        print(sql);
-
-        await _db.execute(sql);
+        await _db.execute(sqlB.toString());
 
         return Future.value();
     }
