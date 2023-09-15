@@ -1,7 +1,6 @@
 library system_whith_db_test;
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:soft_plc/src/helpers/reatain_value.dart';
 import 'package:soft_plc/src/system/sqlite_db_connect.dart';
