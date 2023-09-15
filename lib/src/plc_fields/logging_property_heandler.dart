@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:soft_plc/src/config.dart';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/services.dart';
@@ -7,7 +9,7 @@ class LoggingPropertyHeandler {
     final List<ILoggingProperty> _tasks;
     final ILoggingService _loggingService;
     final Duration _period;
-    bool _run = false;
+    Timer? _timer;
 
     LoggingPropertyHeandler(
         this._tasks,
@@ -19,22 +21,18 @@ class LoggingPropertyHeandler {
         await _loggingService.build();
     }
 
-    Future<void> run() async {
-    
-        _run = true;
-
-        while (_run) {
-            await Future.delayed(_period);
+    void run() {
+        _timer = Timer.periodic(_period, (timer) async {
             final properties = _tasks
                 .map((t) => t.getLoggingProperty())
                 .reduce((acc, t) => acc..addAll(t));
 
             await _loggingService.setLog(properties);
-        }
+        });
     }
 
     void cancel() {
-        _run = false;
+        _timer?.cancel();
     }
 
 }

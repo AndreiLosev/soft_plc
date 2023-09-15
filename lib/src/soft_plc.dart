@@ -26,8 +26,10 @@ class SoftPlc {
 
     Future<void> run() async {
         try {
+            
+            _loggingPropertyHeandler.run();
+
             await Future.any([
-                _loggingPropertyHeandler.run(),
                 _monitoringPropertyHeandler.run(),
                 _networkPropertyHeandler.run(),
                 _periodicTaskCollection.run(_container),
@@ -41,4 +43,12 @@ class SoftPlc {
     void dispatchEvent(Event event) =>
         _container.get<EventQueue>().dispatch(event);
 
+    void stop() {
+        _loggingPropertyHeandler.cancel();
+        _monitoringPropertyHeandler.cancel();
+        _networkPropertyHeandler.cancel();
+        _periodicTaskCollection.cancel();
+        _eventTaskCollection.cancel();
+
+    }
 }
