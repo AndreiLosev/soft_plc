@@ -55,28 +55,36 @@ class NetworkPropertyHeandler {
     Future<void> run() async {
 
         _mqtt.updates!.listen((message) {
-            final topic = message.first.topic;
-            final value = (message.first.payload as MqttPublishMessage).payload.message;
+            try {
+                final topic = message.first.topic;
+                final value = (message.first.payload as MqttPublishMessage).payload.message;
 
-            for (final t in _tasks) {
-                t.setNetworkProperty(
-                    topic,
-                    MqttPayloadBuilder()..addBuffer(value),
-                );
+                for (final t in _tasks) {
+                    t.setNetworkProperty(
+                        topic,
+                        MqttPayloadBuilder()..addBuffer(value),
+                    );
+                }
+            } catch (e, s) {
+                _errorLogger.log(e, s);
             }
         });
 
         while (_mqtt.connectionStatus!.state == MqttConnectionState.connected) {
             await Future.delayed(_config.publicationPeriod);
 
-            for (var t in _tasks) {
-                for (var item in t.getPeriodicallyPublishedValues().entries) {
-                    _mqtt.publishMessage(
-                        item.key,
-                        _config.publicationQot,
-                        item.value.payload,
-                    );
+            try {
+                for (var t in _tasks) {
+                    for (var item in t.getPeriodicallyPublishedValues().entries) {
+                        _mqtt.publishMessage(
+                            item.key,
+                            _config.publicationQot,
+                            item.value.payload,
+                        );
+                    }
                 }
+            } catch (e, s) {
+                _errorLogger.log(e, s);
             }
         }
     }

@@ -8,12 +8,14 @@ class LoggingPropertyHeandler {
     
     final List<ILoggingProperty> _tasks;
     final ILoggingService _loggingService;
+    final IErrorLogger _errorLogger;
     final Duration _period;
     Timer? _timer;
 
     LoggingPropertyHeandler(
         this._tasks,
         this._loggingService,
+        this._errorLogger,
         Config config,
     ): _period = config.loggingPeriod;
 
@@ -23,11 +25,15 @@ class LoggingPropertyHeandler {
 
     void run() {
         _timer = Timer.periodic(_period, (timer) async {
-            final properties = _tasks
+            try {
+                final properties = _tasks
                 .map((t) => t.getLoggingProperty())
                 .reduce((acc, t) => acc..addAll(t));
 
-            await _loggingService.setLog(properties);
+                await _loggingService.setLog(properties);
+            } catch (e, s) {
+                _errorLogger.log(e, s);
+            }
         });
     }
 

@@ -165,6 +165,7 @@ class SoftPlcBuilder {
         _loggingPropertyHeandler = LoggingPropertyHeandler(
             _loggingTasks,
             _container.get<ILoggingService>(),
+            _container.get<IErrorLogger>(),
             _container.get<Config>()
         );
 
@@ -172,6 +173,7 @@ class SoftPlcBuilder {
             _monitorigTask,
             _container.get<Config>(),
             _container.get<EventQueue>(),
+            _container.get<IErrorLogger>(),
         );
 
         _networkPropertyHeandler = NetworkPropertyHeandler(

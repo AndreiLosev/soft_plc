@@ -1,5 +1,6 @@
 import 'package:soft_plc/src/config.dart';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
+import 'package:soft_plc/src/contracts/services.dart';
 import 'package:soft_plc/src/contracts/task.dart';
 import 'package:soft_plc/src/system/event_queue.dart';
 
@@ -7,7 +8,8 @@ class MonitoringPropertyHeandler {
 
     final List<IMonitoringProperty> _tasks;
     final Config _config;
-    final EventQueue _eventQueue; 
+    final EventQueue _eventQueue;
+    final IErrorLogger _errorLogger;
     bool _run = false;
     final Map<String, Object> _oldValues = {};
 
@@ -15,6 +17,7 @@ class MonitoringPropertyHeandler {
         this._tasks,
         this._config,
         this._eventQueue,
+        this._errorLogger,
     );
 
     Future<void> build() async {
@@ -50,8 +53,12 @@ class MonitoringPropertyHeandler {
     }
 
     Future<void> _runOne(Event event, Object value, int id) async {
-        if (_valueIsChanged(_getKey(event, id), value)) {
-            _eventQueue.dispatch(event);                    
+        try {
+            if (_valueIsChanged(_getKey(event, id), value)) {
+                _eventQueue.dispatch(event);                    
+            }
+        } catch (e, s) {
+            _errorLogger.log(e, s);
         }
         
         await Future.delayed(Duration.zero);
