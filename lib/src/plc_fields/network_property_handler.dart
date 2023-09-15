@@ -6,14 +6,14 @@ import 'package:soft_plc/src/contracts/services.dart';
 import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
 import 'package:typed_data/typed_data.dart';
 
-class NetworkPropertyHeandler {
+class NetworkPropertyHandler {
 
     final List<INetworkProperty> _tasks;
     final MqttConfig _config;
     final IErrorLogger _errorLogger;
     final MqttServerClient _mqtt;
 
-    NetworkPropertyHeandler(
+    NetworkPropertyHandler(
         this._tasks,
         this._config,
         this._errorLogger,

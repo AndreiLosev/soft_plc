@@ -4,7 +4,7 @@ import 'package:soft_plc/src/config.dart';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/services.dart';
 
-class LoggingPropertyHeandler {
+class LoggingPropertyHandler {
     
     final List<ILoggingProperty> _tasks;
     final ILoggingService _loggingService;
@@ -12,7 +12,7 @@ class LoggingPropertyHeandler {
     final Duration _period;
     Timer? _timer;
 
-    LoggingPropertyHeandler(
+    LoggingPropertyHandler(
         this._tasks,
         this._loggingService,
         this._errorLogger,

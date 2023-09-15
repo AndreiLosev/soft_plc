@@ -4,7 +4,7 @@ import 'package:soft_plc/src/contracts/services.dart';
 import 'package:soft_plc/src/contracts/task.dart';
 import 'package:soft_plc/src/system/event_queue.dart';
 
-class MonitoringPropertyHeandler {
+class MonitoringPropertyHandler {
 
     final List<IMonitoringProperty> _tasks;
     final Config _config;
@@ -13,7 +13,7 @@ class MonitoringPropertyHeandler {
     bool _run = false;
     final Map<String, Object> _oldValues = {};
 
-    MonitoringPropertyHeandler(
+    MonitoringPropertyHandler(
         this._tasks,
         this._config,
         this._eventQueue,

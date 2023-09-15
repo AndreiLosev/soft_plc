@@ -4,9 +4,9 @@ import 'package:soft_plc/soft_plc.dart';
 import 'package:soft_plc/src/configs/mqtt_config.dart';
 import 'package:soft_plc/src/plc_fields/event_task_collection.dart';
 import 'package:soft_plc/src/plc_fields/event_task_field.dart';
-import 'package:soft_plc/src/plc_fields/logging_property_heandler.dart';
-import 'package:soft_plc/src/plc_fields/monitoring_property_heandler.dart';
-import 'package:soft_plc/src/plc_fields/network_property_heandler.dart';
+import 'package:soft_plc/src/plc_fields/logging_property_handler.dart';
+import 'package:soft_plc/src/plc_fields/monitoring_property_handler.dart';
+import 'package:soft_plc/src/plc_fields/network_property_handler.dart';
 import 'package:soft_plc/src/plc_fields/periodic_task_collection.dart';
 import 'package:soft_plc/src/plc_fields/periodic_task_field.dart';
 import 'package:soft_plc/src/plc_fields/retain_property_heandler.dart';
@@ -19,9 +19,9 @@ class SoftPlcBuilder {
     final List<ILoggingProperty> _loggingTasks = [];
     final List<IMonitoringProperty> _monitorigTask = [];
     final List<INetworkProperty> _networkTask = [];
-    late final LoggingPropertyHeandler _loggingPropertyHeandler;
-    late final MonitoringPropertyHeandler _monitoringPropertyHeandler;
-    late final NetworkPropertyHeandler _networkPropertyHeandler; 
+    late final LoggingPropertyHandler _loggingPropertyHandler;
+    late final MonitoringPropertyHandler _monitoringPropertyHandler;
+    late final NetworkPropertyHandler _networkPropertyHandler; 
     late final PeriodicTaskCollection _periodicTaskCollection;
     late final EventTaskCollection _eventTaskCollection;
 
@@ -60,9 +60,9 @@ class SoftPlcBuilder {
 
         return SoftPlc(
             _container,
-            _loggingPropertyHeandler,
-            _monitoringPropertyHeandler,
-            _networkPropertyHeandler,
+            _loggingPropertyHandler,
+            _monitoringPropertyHandler,
+            _networkPropertyHandler,
             _periodicTaskCollection,
             _eventTaskCollection,
         );
@@ -162,30 +162,30 @@ class SoftPlcBuilder {
     }
 
     Future<void> _createHeandlers() async {
-        _loggingPropertyHeandler = LoggingPropertyHeandler(
+        _loggingPropertyHandler = LoggingPropertyHandler(
             _loggingTasks,
             _container.get<ILoggingService>(),
             _container.get<IErrorLogger>(),
             _container.get<Config>()
         );
 
-        _monitoringPropertyHeandler = MonitoringPropertyHeandler(
+        _monitoringPropertyHandler = MonitoringPropertyHandler(
             _monitorigTask,
             _container.get<Config>(),
             _container.get<EventQueue>(),
             _container.get<IErrorLogger>(),
         );
 
-        _networkPropertyHeandler = NetworkPropertyHeandler(
+        _networkPropertyHandler = NetworkPropertyHandler(
             _networkTask,
             _container.get<Config>().mqttConfig,
             _container.get<IErrorLogger>(),
         );
 
         await Future.wait([
-            _loggingPropertyHeandler.build(),
-            _monitoringPropertyHeandler.build(),
-            _networkPropertyHeandler.build(),
+            _loggingPropertyHandler.build(),
+            _monitoringPropertyHandler.build(),
+            _networkPropertyHandler.build(),
             _periodicTaskCollection.build(),
             _eventTaskCollection.build(),
 
