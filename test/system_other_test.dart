@@ -1,5 +1,3 @@
-library system_other;
-
 import 'package:soft_plc/src/contracts/task.dart';
 import 'package:soft_plc/src/system/console_error_logger.dart';
 import 'package:soft_plc/src/system/event_queue.dart';

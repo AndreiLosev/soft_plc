@@ -1,5 +1,3 @@
-library helpers_classes_test;
-
 import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
 import 'package:soft_plc/src/helpers/reatain_value.dart';
 import 'package:test/test.dart';

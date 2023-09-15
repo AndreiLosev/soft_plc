@@ -3,10 +3,12 @@ library runtime_heandlers;
 import 'dart:async';
 
 import 'package:soft_plc/src/plc_fields/logging_property_handler.dart';
+import 'package:soft_plc/src/plc_fields/retain_property_heandler.dart';
 import 'package:soft_plc/src/service_container.dart';
 import 'package:soft_plc/src/system/console_error_logger.dart';
 import 'package:soft_plc/src/system/sqlite_db_connect.dart';
 import 'package:soft_plc/src/system/sqlite_logging_service.dart';
+import 'package:soft_plc/src/system/sqlite_reatain_service.dart';
 import 'configs_for_tests.dart';
 import 'tasks_for_tests.dart';
 import 'package:test/test.dart';
@@ -39,10 +41,6 @@ void main() {
 
         final result = await db.select("SELECT name, value FROM ${service.table}");
 
-        print(result);
-
-        expect(result.length, 4);
-
         expect(
             result,
             [
@@ -53,5 +51,29 @@ void main() {
             ],
         );
 
+    });
+
+    test('retain_property', () async {
+        final task = OneTask();
+        final db = SqliteDbConnect();
+        final service = SqliteReatainService(db);
+
+        final handler = RetainPropertyHeandler(service);
+        await handler.init(task);
+
+        final sc = ServiceContainer();
+        task.execute(sc);
+        task.execute(sc);
+        task.execute(sc);
+
+        await handler.save(task);
+
+        final task1 = OneTask();
+
+        await handler.init(task1);
+
+        db.dispose();
+
+        expect([task.x1, task.x2], [task1.x1, task1.x2]);
     });
 }

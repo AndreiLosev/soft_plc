@@ -8,9 +8,9 @@ class RetainPropertyHeandler {
 
     Future<void> init(IRetainProperty task) async {
         final retainProperty = task.getRetainProperty();
-        retainProperty.forEach((name, value) async =>
-            await _reatainService.createIfNotExists(name, value)
-        );
+        for (final i in retainProperty.entries) {
+            await _reatainService.createIfNotExists(i.key, i.value);
+        }
 
         final restoredProeprty = await _reatainService.select(retainProperty.keys.toSet());
 
