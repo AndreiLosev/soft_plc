@@ -57,6 +57,8 @@ class MonitoringPropertyHandler {
             if (_valueIsChanged(_getKey(event, id), value)) {
                 _eventQueue.dispatch(event);                    
             }
+
+            _oldValues[_getKey(event, id)] = value;
         } catch (e, s) {
             _errorLogger.log(e, s);
         }

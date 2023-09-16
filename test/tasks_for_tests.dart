@@ -3,7 +3,7 @@ import 'package:soft_plc/src/contracts/task.dart';
 import 'package:soft_plc/src/helpers/reatain_value.dart';
 import 'package:soft_plc/src/service_container.dart';
 
-class OneTask extends PeriodicTask implements ILoggingProperty, IRetainProperty {
+class OneTask extends PeriodicTask implements ILoggingProperty, IRetainProperty, IMonitoringProperty {
 
     int x1 = 0;
     double x2 = 0.0;
@@ -38,4 +38,25 @@ class OneTask extends PeriodicTask implements ILoggingProperty, IRetainProperty 
         x1 = properties[addPrefix('x1')]!.value as int;
         x2 = properties[addPrefix('x2')]!.value as double;
     }
+
+    @override
+    List<(Event, Object)> getEventValues() {
+        return [(TwoEvent(x1), x1)];
+    }
+}
+
+class TwoTask extends EventTask<TwoEvent> {
+    
+    String val = '0';
+
+    @override
+    void execute(ServiceContainer container, TwoEvent event) {
+        val = "$val {$event.val}";
+    }
+}
+
+class TwoEvent extends Event {
+    final int val;
+
+    TwoEvent(this.val);
 }

@@ -17,7 +17,6 @@ abstract interface class ILoggingProperty {
 abstract interface class IMonitoringProperty {
     
     List<(Event, Object)> getEventValues();
-    bool floatIsEquals(double a, double b);
 }
 
 abstract interface class INetworkProperty {

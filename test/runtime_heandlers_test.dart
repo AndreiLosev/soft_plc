@@ -1,11 +1,13 @@
-library runtime_heandlers;
-
 import 'dart:async';
 
+import 'package:soft_plc/src/config.dart';
+import 'package:soft_plc/src/configs/mqtt_config.dart';
 import 'package:soft_plc/src/plc_fields/logging_property_handler.dart';
+import 'package:soft_plc/src/plc_fields/monitoring_property_handler.dart';
 import 'package:soft_plc/src/plc_fields/retain_property_heandler.dart';
 import 'package:soft_plc/src/service_container.dart';
 import 'package:soft_plc/src/system/console_error_logger.dart';
+import 'package:soft_plc/src/system/event_queue.dart';
 import 'package:soft_plc/src/system/sqlite_db_connect.dart';
 import 'package:soft_plc/src/system/sqlite_logging_service.dart';
 import 'package:soft_plc/src/system/sqlite_reatain_service.dart';
@@ -76,4 +78,41 @@ void main() {
 
         expect([task.x1, task.x2], [task1.x1, task1.x2]);
     });
+
+    test("monitoring_property", () async {
+        final ptask = OneTask();
+        final eloger = ConsoleErrorLogger();
+        final equeue = EventQueue(eloger);
+        final config = Config(MqttConfig());
+        final sc = ServiceContainer();
+
+        final handler = MonitoringPropertyHandler([ptask], config, equeue, eloger);
+
+        await handler.build();
+
+        handler.run();
+
+        await Future.delayed(Duration(milliseconds: 10));
+        ptask.execute(sc);
+        await Future.delayed(Duration(milliseconds: 10));
+        ptask.execute(sc);
+        await Future.delayed(Duration(milliseconds: 10));
+        ptask.execute(sc);
+
+        int i = 0;
+        await for (final e in equeue.listen()) {    
+            if (e is TwoEvent) {
+                i += 1;
+                expect(e.val, i);
+            } else {
+                expect(true, false);
+            }
+
+            if (i >= 3) {
+                break;
+            }
+        }
+
+
+});
 }
