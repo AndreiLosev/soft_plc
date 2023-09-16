@@ -51,7 +51,46 @@ class TwoTask extends EventTask<TwoEvent> {
 
     @override
     void execute(ServiceContainer container, TwoEvent event) {
-        val = "$val {$event.val}";
+        val = "$val ${event.val}";
+    }
+}
+
+class FourthTask extends EventTask<FourthEvent> {
+
+    int sum = 0;
+
+    @override
+    void execute(ServiceContainer container, FourthEvent event) {
+        sum += event.list.reduce((v, e) => v + e);
+    }
+}
+
+class FourthEvent extends Event {
+    final List<int> list;
+
+    FourthEvent(this.list);
+}
+
+class FifthTask extends EventTask<Event> {
+
+    int sumTwo = 0;
+    int sumFourth = 0;
+    int product = 0;
+
+    @override
+    Set<Type> get eventSubscriptions => {FourthEvent, TwoEvent};
+
+    @override
+    void execute(ServiceContainer container, Event event) {
+        if (event is TwoEvent) {
+            sumTwo += event.val;
+        }
+
+        if (event is FourthEvent) {
+            sumFourth += event.list.reduce((v, e) => v + e);
+        }
+
+        product = sumTwo * sumFourth;
     }
 }
 

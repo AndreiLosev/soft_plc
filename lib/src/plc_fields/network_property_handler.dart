@@ -28,15 +28,15 @@ class NetworkPropertyHandler {
         int count = 0;
 
         while (count <= _config.numberAttemptsConnect) {
-            _mqtt
-                ..logging(on: _config.logging)
-                ..setProtocolV311()
-                ..keepAlivePeriod = _config.keepAlivePeriod.inSeconds
-                ..connectTimeoutPeriod = _config.connectTimeoutPeriod.inMilliseconds
-                ..connectionMessage = _getConnectMessage()
-            ;
-
             try {
+                _mqtt
+                    ..logging(on: _config.logging)
+                    ..setProtocolV311()
+                    ..keepAlivePeriod = _config.keepAlivePeriod.inSeconds
+                    ..connectTimeoutPeriod = _config.connectTimeoutPeriod.inMilliseconds
+                    ..connectionMessage = _getConnectMessage()
+                ;
+
                 count += 1;
                 await _mqtt.connect(_config.username, _config.password);
                 break;

@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:soft_plc/src/config.dart';
 import 'package:soft_plc/src/configs/mqtt_config.dart';
+import 'package:soft_plc/src/plc_fields/event_task_collection.dart';
+import 'package:soft_plc/src/plc_fields/event_task_field.dart';
 import 'package:soft_plc/src/plc_fields/logging_property_handler.dart';
 import 'package:soft_plc/src/plc_fields/monitoring_property_handler.dart';
 import 'package:soft_plc/src/plc_fields/periodic_task_collection.dart';
@@ -140,5 +142,44 @@ void main() {
             [task.x1, task.x2, tasl1.s],
             [4, 4.4, "1 1 1 1 1"],
         );
+    });
+
+    test('event_tsk', () async {
+        final task1 = TwoTask();
+        final task2 = FourthTask();
+        final task3 = FifthTask();
+
+        final eLog = ConsoleErrorLogger();
+        final db = SqliteDbConnect();
+        final retainSercie = SqliteReatainService(db);
+        final reatinHandler = RetainPropertyHeandler(retainSercie);
+
+        final taskField1 = EventTaskField(task1, reatinHandler, eLog);
+        final taskField2 = EventTaskField(task2, reatinHandler, eLog);
+        final taskField3 = EventTaskField(task3, reatinHandler, eLog);
+
+        final queue = EventQueue(eLog);
+
+        final handler = EventTaskCollection([taskField1, taskField2, taskField3], queue);
+        final sc = ServiceContainer();
+
+        await handler.build();
+        
+        handler.run(sc);
+
+        queue.dispatch(TwoEvent(2));
+        queue.dispatch(FourthEvent([1, 2]));
+        queue.dispatch(TwoEvent(4));
+        queue.dispatch(FourthEvent([2, 3]));
+        queue.dispatch(TwoEvent(8));
+        queue.dispatch(FourthEvent([3, 4]));
+
+        await Future.delayed(Duration(milliseconds: 50));
+
+        expect(
+            [task1.val, task2.sum, task3.sumTwo, task3.sumFourth, task3.product],
+            ["0 2 4 8", 15, 14, 15, 210],
+        );
+
     });
 }
