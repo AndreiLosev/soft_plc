@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:soft_plc/src/config.dart';
 import 'package:soft_plc/src/configs/mqtt_config.dart';
 import 'package:soft_plc/src/plc_fields/logging_property_handler.dart';
 import 'package:soft_plc/src/plc_fields/monitoring_property_handler.dart';
+import 'package:soft_plc/src/plc_fields/periodic_task_collection.dart';
+import 'package:soft_plc/src/plc_fields/periodic_task_field.dart';
 import 'package:soft_plc/src/plc_fields/retain_property_heandler.dart';
 import 'package:soft_plc/src/service_container.dart';
 import 'package:soft_plc/src/system/console_error_logger.dart';
@@ -46,10 +49,10 @@ void main() {
         expect(
             result,
             [
-                {'name': task.addPrefix('x1'), 'value': 0.toString()},
-                {'name': task.addPrefix('x2'), 'value': 0.0.toString()},
-                {'name': task.addPrefix('x1'), 'value': 1.toString()},
-                {'name': task.addPrefix('x2'), 'value':1.1.toString()},
+                {'name': task.addClassName('x1'), 'value': 0.toString()},
+                {'name': task.addClassName('x2'), 'value': 0.0.toString()},
+                {'name': task.addClassName('x1'), 'value': 1.toString()},
+                {'name': task.addClassName('x2'), 'value':1.1.toString()},
             ],
         );
 
@@ -112,7 +115,30 @@ void main() {
                 break;
             }
         }
+    });
 
+    test('periodic_task', () async {
+        final task = OneTask();
+        final tasl1 = ThreeTask();
+        final eloger = ConsoleErrorLogger();
+        final db = SqliteDbConnect();
+        final retainSercie = SqliteReatainService(db);
+        final reatinHandler = RetainPropertyHeandler(retainSercie);
+        final taskField = PeriodicTaskField(task, reatinHandler, eloger);
+        final taskField1 = PeriodicTaskField(tasl1, reatinHandler, eloger);
+        final sc = ServiceContainer();
 
-});
+        final handler = PeriodicTaskCollection([taskField, taskField1]);
+
+        await handler.build();
+
+        handler.run(sc);
+
+        await Future.delayed(Duration(milliseconds: 50), () => handler.cancel());
+
+        expect(
+            [task.x1, task.x2, tasl1.s],
+            [4, 4.4, "1 1 1 1 1"],
+        );
+    });
 }

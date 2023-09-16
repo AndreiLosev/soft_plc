@@ -20,23 +20,23 @@ class OneTask extends PeriodicTask implements ILoggingProperty, IRetainProperty,
     @override
     Map<String, Object> getLoggingProperty() {
         return {
-            addPrefix('x1'): x1,
-            addPrefix('x2'): x2,
+            addClassName('x1'): x1,
+            addClassName('x2'): x2,
         };
     }
 
     @override
     Map<String, ReatainValue<Object>> getRetainProperty() {
         return {
-            addPrefix('x1'): ReatainNumValue(x1),
-            addPrefix('x2'): ReatainNumValue(x2),
+            addClassName('x1'): ReatainNumValue(x1),
+            addClassName('x2'): ReatainNumValue(x2),
         };
     }
 
     @override
     void setRetainProperties(Map<String, ReatainValue> properties) {
-        x1 = properties[addPrefix('x1')]!.value as int;
-        x2 = properties[addPrefix('x2')]!.value as double;
+        x1 = properties[addClassName('x1')]!.value as int;
+        x2 = properties[addClassName('x2')]!.value as double;
     }
 
     @override
@@ -52,6 +52,19 @@ class TwoTask extends EventTask<TwoEvent> {
     @override
     void execute(ServiceContainer container, TwoEvent event) {
         val = "$val {$event.val}";
+    }
+}
+
+class ThreeTask extends PeriodicTask {
+
+    String s = "1";
+
+    @override
+    Duration get period => Duration(milliseconds: 15);
+
+    @override
+    void execute(ServiceContainer container) {
+        s = "1 $s";
     }
 }
 

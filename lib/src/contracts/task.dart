@@ -1,7 +1,7 @@
 import 'package:soft_plc/src/service_container.dart';
 
 abstract class Task {
-    String addPrefix(String name) => 
+    String addClassName(String name) => 
         "${runtimeType.toString()}:$name";
 }
 
