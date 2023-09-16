@@ -1,4 +1,4 @@
-plan:
-    * backup sqlite
-    * command server
-    * pause
+### plan:
+    - backup sqlite
+    - command server
+    - pause
