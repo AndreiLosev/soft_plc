@@ -23,19 +23,22 @@ class SmartBuffer {
         val ? addByte(1) : addByte(0);
     }
 
-    void addUint16(int val) {
+    void addUint16(int val, [bool bigEndian = false]) {
         final tmp = Uint16List.fromList([val]);
-        _payload.addAll(tmp.buffer.asUint8List());
+        final bytes = _byteOrder(tmp.buffer.asUint8List(), bigEndian);
+        _payload.addAll(bytes);
     }
 
-    void addUint32(int val) {
+    void addUint32(int val, [bool bigEndian = false]) {
         final tmp = Uint32List.fromList(<int>[val]);
-        _payload.addAll(tmp.buffer.asInt8List());
+        final bytes = _byteOrder(tmp.buffer.asUint8List(), bigEndian);
+        _payload.addAll(bytes);
     }
 
-    void addUint64(int val) {
+    void addUint64(int val, [bool bigEndian = false]) {
         final tmp = Uint64List.fromList(<int>[val]);
-        _payload.addAll(tmp.buffer.asUint8List());
+        final bytes = _byteOrder(tmp.buffer.asUint8List(), bigEndian);
+        _payload.addAll(bytes);
     }
 
     void addString(String val) {
@@ -43,14 +46,16 @@ class SmartBuffer {
         _payload.addAll(encoder.convert(val));
     }
 
-    void addFloat32(double val) {
+    void addFloat32(double val, [bool bigEndian = false]) {
         final tmp = Float32List.fromList([val]);
-        _payload.addAll(tmp.buffer.asUint8List());
+        final bytes = _byteOrder(tmp.buffer.asUint8List(), bigEndian);
+        _payload.addAll(bytes);
     }
 
-    void addDouble(double val) {
+    void addDouble(double val, [bool bigEndian = false]) {
         final tmp = Float64List.fromList([val]);
-        _payload.addAll(tmp.buffer.asUint8List());
+        final bytes = _byteOrder(tmp.buffer.asUint8List(), bigEndian);
+        _payload.addAll(bytes);
     }
 
     void clear() {
@@ -58,76 +63,84 @@ class SmartBuffer {
     }
 
     bool getAsBool() {
-        final slice = _sliceFromBuffer(1);
+        final slice = _sliceFromBuffer(1, false);
         return slice.first > 0;
     }
 
     String getAsString([int? length]) {
-        final slice = _sliceFromBuffer(length);        
+        final slice = _sliceFromBuffer(length, false);        
         const decoder = Utf8Decoder();
 
         return decoder.convert(slice);
     }
 
-    int getAsUint64() {
-        final slice = _sliceFromBuffer(8);
+    int getAsUint64([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(8, bigEndian);
         return Uint8List.fromList(slice).buffer.asUint64List().first;
     }
 
-    int getAsInt64() {
-        final slice = _sliceFromBuffer(8);
+    int getAsInt64([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(8, bigEndian);
         return Uint8List.fromList(slice).buffer.asInt64List().first;
     }
 
-    int getAsUint32() {
-        final slice = _sliceFromBuffer(4);
+    int getAsUint32([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(4, bigEndian);
         return Uint8List.fromList(slice).buffer.asUint32List().first;
     }
 
-    int getAsInt32() {
-        final slice = _sliceFromBuffer(4);
+    int getAsInt32([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(4, bigEndian);
         return Uint8List.fromList(slice).buffer.asInt32List().first;
     }
 
-    int getAsUint16() {
-        final slice = _sliceFromBuffer(2);
+    int getAsUint16([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(2, bigEndian);
         return Uint8List.fromList(slice).buffer.asUint16List().first;
     }
 
-    int getAsInt16() {
-        final slice = _sliceFromBuffer(2);
+    int getAsInt16([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(2, bigEndian);
         return Uint8List.fromList(slice).buffer.asInt16List().first;
     }
 
-    int getAsUint8() {
-        return _sliceFromBuffer(1).first;
+    int getAsUint8([bool bigEndian = false]) {
+        return _sliceFromBuffer(1, bigEndian).first;
     }
 
-    int getAsInt8() {
-        return _sliceFromBuffer(1).first;
+    int getAsInt8([bool bigEndian = false]) {
+        return _sliceFromBuffer(1, bigEndian).first;
     }
 
-    double getAsFloat() {
-        final slice = _sliceFromBuffer(4);
+    double getAsFloat([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(4, bigEndian);
         return slice.buffer.asFloat32List().first;
     }
 
-    double getAsDouble() {
-        final slice = _sliceFromBuffer(8);
+    double getAsDouble([bool bigEndian = false]) {
+        final slice = _sliceFromBuffer(8, bigEndian);
         return slice.buffer.asFloat64List().first;
     }
 
-    Uint8Buffer _sliceFromBuffer(int? length) {
-        
+    Uint8Buffer _sliceFromBuffer(int? length, bool bigEndian) {
 
         final len = length ?? _payload.length;
         final slice = Uint8Buffer(len);
 
         for (var i = 0; i < len; i++) {
             final byte = _payload.removeLast();
-            slice[len - i - 1] = byte;
+            final index = bigEndian ? i : len - i - 1;
+            slice[index] = byte;
         }
 
             return slice;
+    }
+
+    Iterable<int> _byteOrder(Uint8List bytes, bool bigEndian) {
+        if (bigEndian)  {
+            return bytes.reversed;
+        }
+
+        return bytes;
     }
 }
