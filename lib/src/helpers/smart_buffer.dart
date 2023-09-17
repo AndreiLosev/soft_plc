@@ -41,9 +41,9 @@ class SmartBuffer {
         _payload.addAll(bytes);
     }
 
-    void addString(String val) {
+    void addString(Object val) {
         const encoder = Utf8Encoder();
-        _payload.addAll(encoder.convert(val));
+        _payload.addAll(encoder.convert(val.toString()));
     }
 
     void addFloat32(double val, [bool bigEndian = false]) {

@@ -15,6 +15,7 @@ void main() {
             ..addString("hello or Привет !%^&")
             ..addDouble(-9.234)
             ..addFloat32(9555.8975, true)
+            ..addString(777)
         ;
 
         final expect = Uint8Buffer();
@@ -27,9 +28,11 @@ void main() {
                       208, 184, 208, 178, 208, 181, 209, 130, 32, 33, 37, 94, 38])
             ..addAll([0x2b, 0x87, 0x16, 0xd9, 0xce, 0x77, 0x22, 0xc0])
             ..addAll([0x46, 0x15, 0x4f, 0x97])
+            ..addAll([0x37, 0x37, 0x37])
         ;
 
         expectLater(expect, builder.payload);
+        expectLater("777", builder.getAsString(3));
         expectLater(9555.8975.round(), builder.getAsFloat(true).round());
         expectLater(-9.234.round(), builder.getAsDouble().round());
         expectLater("hello or Привет !%^&", builder.getAsString(26));
