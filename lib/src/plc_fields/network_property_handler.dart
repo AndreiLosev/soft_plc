@@ -3,7 +3,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:soft_plc/src/configs/mqtt_config.dart';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/services.dart';
-import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
+import 'package:soft_plc/src/helpers/smart_buffer.dart';
 import 'package:typed_data/typed_data.dart';
 
 class NetworkPropertyHandler {
@@ -62,7 +62,7 @@ class NetworkPropertyHandler {
                 for (final t in _tasks) {
                     t.setNetworkProperty(
                         topic,
-                        MqttPayloadBuilder()..addBuffer(value),
+                        SmartBuffer()..addBuffer(value),
                     );
                 }
             } catch (e, s) {

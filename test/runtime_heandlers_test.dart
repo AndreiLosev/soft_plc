@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:soft_plc/src/config.dart';
 import 'package:soft_plc/src/configs/mqtt_config.dart';

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:typed_data/typed_data.dart';
 
-class MqttPayloadBuilder {
+class SmartBuffer {
   
     final Uint8Buffer _payload = Uint8Buffer();
 

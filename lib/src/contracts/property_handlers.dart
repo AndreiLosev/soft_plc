@@ -1,7 +1,5 @@
 
-import 'package:soft_plc/src/contracts/task.dart';
-import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
-import 'package:soft_plc/src/helpers/reatain_value.dart';
+import 'package:soft_plc/soft_plc.dart';
 
 abstract interface class IRetainProperty {
     
@@ -22,6 +20,6 @@ abstract interface class IMonitoringProperty {
 abstract interface class INetworkProperty {
 
     Set<String> getTopicSubscriptions();
-    void setNetworkProperty(String topic, MqttPayloadBuilder value);
-    Map<String, MqttPayloadBuilder> getPeriodicallyPublishedValues();
+    void setNetworkProperty(String topic, SmartBuffer value);
+    Map<String, SmartBuffer> getPeriodicallyPublishedValues();
 }

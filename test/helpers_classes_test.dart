@@ -1,12 +1,11 @@
-import 'package:soft_plc/src/helpers/mqtt_payload_builder.dart';
-import 'package:soft_plc/src/helpers/reatain_value.dart';
+import 'package:soft_plc/soft_plc.dart';
 import 'package:test/test.dart';
 import 'package:typed_data/typed_data.dart';
 
 void main() {
     test('mqtt_payload_builder_test', () {
 
-        final builder = MqttPayloadBuilder();
+        final builder = SmartBuffer();
 
         builder
             ..addByte(66)
