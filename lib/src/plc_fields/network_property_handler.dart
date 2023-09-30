@@ -12,6 +12,7 @@ class NetworkPropertyHandler {
     final MqttConfig _config;
     final IErrorLogger _errorLogger;
     final MqttServerClient _mqtt;
+    bool _run = false;
 
     NetworkPropertyHandler(
         this._tasks,
@@ -24,35 +25,40 @@ class NetworkPropertyHandler {
         );
 
     Future<void> build() async {
-
-        int count = 0;
-
-        while (count <= _config.numberAttemptsConnect) {
-            try {
-                _mqtt
-                    ..logging(on: _config.logging)
-                    ..setProtocolV311()
-                    ..keepAlivePeriod = _config.keepAlivePeriod.inSeconds
-                    ..connectTimeoutPeriod = _config.connectTimeoutPeriod.inMilliseconds
-                    ..connectionMessage = _getConnectMessage()
-                ;
-
-                count += 1;
-                await _mqtt.connect(_config.username, _config.password);
-                break;
-            } catch (e, s) {
-                _errorLogger.log(e, s, count >= _config.numberAttemptsConnect);
-            }
-        }
         
         for (var t in _tasks) {
             for (var topic in t.getTopicSubscriptions()) {
                 _mqtt.subscribe(topic, _config.subscriptionQot);          
             }
         }
+
+        return Future.value();
     }
 
     Future<void> run() async {
+
+        int count = 0;
+        _run = true;
+
+        while (_run) {
+            try {
+                _mqtt
+                    ..logging(on: _config.logging)
+                    ..setProtocolV311()
+                    ..keepAlivePeriod = _config.keepAlivePeriod.inSeconds
+                    ..connectTimeoutPeriod = _config.connectTimeoutPeriod.inMilliseconds
+                    ..autoReconnect = true
+                    ..connectionMessage = _getConnectMessage()
+                ;
+
+                count = (count += 1) % 10;
+                await _mqtt.connect(_config.username, _config.password);
+                break;
+            } catch (e, s) {
+                _errorLogger.log(e, s);
+                await Future.delayed(Duration(seconds: count));
+            }
+        }
 
         _mqtt.updates!.listen((message) {
             try {
@@ -89,11 +95,12 @@ class NetworkPropertyHandler {
         }
     }
 
-    void publishMessage(String topic, Uint8Buffer message) {
-        _mqtt.publishMessage(topic, _config.publicationQot, message);
+    void publishMessage(String topic, Uint8Buffer message, [bool retain = false]) {
+        _mqtt.publishMessage(topic, _config.publicationQot, message, retain: retain);
     }
 
     void cancel() {
+        _run = false;
         _mqtt.disconnect();
     }
 

@@ -36,3 +36,7 @@ abstract interface class IDbConnect {
         List<Object?> params = const [],
     ]);
 }
+
+abstract interface class INetworkService {
+    Future<void> connect<T extends Object>(T param);
+}

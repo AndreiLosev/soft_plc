@@ -10,6 +10,7 @@ class PublishMessageTask extends EventTask<PublishMqttMessage> {
         container.get<NetworkPropertyHandler>().publishMessage(
             event.topic,
             event.message,
+            event.retain,
         );
     }
 }
