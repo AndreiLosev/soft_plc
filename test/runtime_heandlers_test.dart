@@ -20,165 +20,164 @@ import 'tasks_for_tests.dart';
 import 'package:test/test.dart';
 
 void main() {
-    test('logging_property', () async {
-        final task = OneTask();
-        final db = SqliteDbConnect();
-        final service = SqliteLoggingLervice(db);
-        await service.build();
-        final eLogger = ConsoleErrorLogger();
-        final config = LoggingHandlerConfig();    
+  test('logging_property', () async {
+    final task = OneTask();
+    final db = SqliteDbConnect();
+    final service = SqliteLoggingLervice(db);
+    await service.build();
+    final eLogger = ConsoleErrorLogger();
+    final config = LoggingHandlerConfig();
 
-        final handler = LoggingPropertyHandler(
-            [task],
-            service,
-            eLogger,
-            config,
-        );
+    final handler = LoggingPropertyHandler(
+      [task],
+      service,
+      eLogger,
+      config,
+    );
 
-        handler.run();
+    handler.run();
 
-        Timer(Duration(milliseconds: 30), () {
-            task.execute(ServiceContainer());
-        });
-
-        await Future.delayed(config.loggingPeriod * 2.5, () {
-            handler.cancel();
-        });
-
-        final result = await db.select("SELECT name, value FROM ${service.table}");
-
-        expect(
-            result,
-            [
-                {'name': task.addClassName('x1'), 'value': 0.toString()},
-                {'name': task.addClassName('x2'), 'value': 0.0.toString()},
-                {'name': task.addClassName('x1'), 'value': 1.toString()},
-                {'name': task.addClassName('x2'), 'value':1.1.toString()},
-            ],
-        );
-
+    Timer(Duration(milliseconds: 30), () {
+      task.execute(ServiceContainer());
     });
 
-    test('retain_property', () async {
-        final task = OneTask();
-        final db = SqliteDbConnect();
-        final service = SqliteReatainService(db);
-
-        final handler = RetainPropertyHeandler(service);
-        await handler.init(task);
-
-        final sc = ServiceContainer();
-        task.execute(sc);
-        task.execute(sc);
-        task.execute(sc);
-
-        await handler.save(task);
-
-        final task1 = OneTask();
-
-        await handler.init(task1);
-
-        db.dispose();
-
-        expect([task.x1, task.x2], [task1.x1, task1.x2]);
+    await Future.delayed(config.loggingPeriod * 2.5, () {
+      handler.cancel();
     });
 
-    test("monitoring_property", () async {
-        final ptask = OneTask();
-        final eloger = ConsoleErrorLogger();
-        final equeue = EventQueue(eloger);
-        final config = Config(NetworkConfig());
-        final sc = ServiceContainer();
+    final result = await db.select("SELECT name, value FROM ${service.table}");
 
-        final handler = MonitoringPropertyHandler([ptask], config, equeue, eloger);
+    expect(
+      result,
+      [
+        {'name': task.addClassName('x1'), 'value': 0.toString()},
+        {'name': task.addClassName('x2'), 'value': 0.0.toString()},
+        {'name': task.addClassName('x1'), 'value': 1.toString()},
+        {'name': task.addClassName('x2'), 'value': 1.1.toString()},
+      ],
+    );
+  });
 
-        await handler.build();
+  test('retain_property', () async {
+    final task = OneTask();
+    final db = SqliteDbConnect();
+    final service = SqliteReatainService(db);
 
-        handler.run();
+    final handler = RetainPropertyHeandler(service);
+    await handler.init(task);
 
-        await Future.delayed(Duration(milliseconds: 10));
-        ptask.execute(sc);
-        await Future.delayed(Duration(milliseconds: 10));
-        ptask.execute(sc);
-        await Future.delayed(Duration(milliseconds: 10));
-        ptask.execute(sc);
+    final sc = ServiceContainer();
+    task.execute(sc);
+    task.execute(sc);
+    task.execute(sc);
 
-        int i = 0;
-        await for (final e in equeue.listen()) {    
-            if (e is TwoEvent) {
-                i += 1;
-                expect(e.val, i);
-            } else {
-                expect(true, false);
-            }
+    await handler.save(task);
 
-            if (i >= 3) {
-                break;
-            }
-        }
-    });
+    final task1 = OneTask();
 
-    test('periodic_task', () async {
-        final task = OneTask();
-        final tasl1 = ThreeTask();
-        final eloger = ConsoleErrorLogger();
-        final db = SqliteDbConnect();
-        final retainSercie = SqliteReatainService(db);
-        final reatinHandler = RetainPropertyHeandler(retainSercie);
-        final taskField = PeriodicTaskField(task, reatinHandler, eloger);
-        final taskField1 = PeriodicTaskField(tasl1, reatinHandler, eloger);
-        final sc = ServiceContainer();
+    await handler.init(task1);
 
-        final handler = PeriodicTaskCollection([taskField, taskField1]);
+    db.dispose();
 
-        await handler.build();
+    expect([task.x1, task.x2], [task1.x1, task1.x2]);
+  });
 
-        handler.run(sc);
+  test("monitoring_property", () async {
+    final ptask = OneTask();
+    final eloger = ConsoleErrorLogger();
+    final equeue = EventQueue(eloger);
+    final config = Config(NetworkConfig());
+    final sc = ServiceContainer();
 
-        await Future.delayed(Duration(milliseconds: 50), () => handler.cancel());
+    final handler = MonitoringPropertyHandler([ptask], config, equeue, eloger);
 
-        expect(
-            [task.x1, task.x2, tasl1.s],
-            [4, 4.4, "1 1 1 1 1"],
-        );
-    });
+    await handler.build();
 
-    test('event_tsk', () async {
-        final task1 = TwoTask();
-        final task2 = FourthTask();
-        final task3 = FifthTask();
+    handler.run();
 
-        final eLog = ConsoleErrorLogger();
-        final db = SqliteDbConnect();
-        final retainSercie = SqliteReatainService(db);
-        final reatinHandler = RetainPropertyHeandler(retainSercie);
+    await Future.delayed(Duration(milliseconds: 10));
+    ptask.execute(sc);
+    await Future.delayed(Duration(milliseconds: 10));
+    ptask.execute(sc);
+    await Future.delayed(Duration(milliseconds: 10));
+    ptask.execute(sc);
 
-        final taskField1 = EventTaskField(task1, reatinHandler, eLog);
-        final taskField2 = EventTaskField(task2, reatinHandler, eLog);
-        final taskField3 = EventTaskField(task3, reatinHandler, eLog);
+    int i = 0;
+    await for (final e in equeue.listen()) {
+      if (e is TwoEvent) {
+        i += 1;
+        expect(e.val, i);
+      } else {
+        expect(true, false);
+      }
 
-        final queue = EventQueue(eLog);
+      if (i >= 3) {
+        break;
+      }
+    }
+  });
 
-        final handler = EventTaskCollection([taskField1, taskField2, taskField3], queue);
-        final sc = ServiceContainer();
+  test('periodic_task', () async {
+    final task = OneTask();
+    final tasl1 = ThreeTask();
+    final eloger = ConsoleErrorLogger();
+    final db = SqliteDbConnect();
+    final retainSercie = SqliteReatainService(db);
+    final reatinHandler = RetainPropertyHeandler(retainSercie);
+    final taskField = PeriodicTaskField(task, reatinHandler, eloger);
+    final taskField1 = PeriodicTaskField(tasl1, reatinHandler, eloger);
+    final sc = ServiceContainer();
 
-        await handler.build();
-        
-        handler.run(sc);
+    final handler = PeriodicTaskCollection([taskField, taskField1]);
 
-        queue.dispatch(TwoEvent(2));
-        queue.dispatch(FourthEvent([1, 2]));
-        queue.dispatch(TwoEvent(4));
-        queue.dispatch(FourthEvent([2, 3]));
-        queue.dispatch(TwoEvent(8));
-        queue.dispatch(FourthEvent([3, 4]));
+    await handler.build();
 
-        await Future.delayed(Duration(milliseconds: 50));
+    handler.run(sc);
 
-        expect(
-            [task1.val, task2.sum, task3.sumTwo, task3.sumFourth, task3.product],
-            ["0 2 4 8", 15, 14, 15, 210],
-        );
+    await Future.delayed(Duration(milliseconds: 50), () => handler.cancel());
 
-    });
+    expect(
+      [task.x1, task.x2, tasl1.s],
+      [4, 4.4, "1 1 1 1 1"],
+    );
+  });
+
+  test('event_tsk', () async {
+    final task1 = TwoTask();
+    final task2 = FourthTask();
+    final task3 = FifthTask();
+
+    final eLog = ConsoleErrorLogger();
+    final db = SqliteDbConnect();
+    final retainSercie = SqliteReatainService(db);
+    final reatinHandler = RetainPropertyHeandler(retainSercie);
+
+    final taskField1 = EventTaskField(task1, reatinHandler, eLog);
+    final taskField2 = EventTaskField(task2, reatinHandler, eLog);
+    final taskField3 = EventTaskField(task3, reatinHandler, eLog);
+
+    final queue = EventQueue(eLog);
+
+    final handler =
+        EventTaskCollection([taskField1, taskField2, taskField3], queue);
+    final sc = ServiceContainer();
+
+    await handler.build();
+
+    handler.run(sc);
+
+    queue.dispatch(TwoEvent(2));
+    queue.dispatch(FourthEvent([1, 2]));
+    queue.dispatch(TwoEvent(4));
+    queue.dispatch(FourthEvent([2, 3]));
+    queue.dispatch(TwoEvent(8));
+    queue.dispatch(FourthEvent([3, 4]));
+
+    await Future.delayed(Duration(milliseconds: 50));
+
+    expect(
+      [task1.val, task2.sum, task3.sumTwo, task3.sumFourth, task3.product],
+      ["0 2 4 8", 15, 14, 15, 210],
+    );
+  });
 }
