@@ -1,3 +1,6 @@
+import 'dart:collection';
+
+import 'package:mqtt_client/mqtt_client.dart';
 import 'package:soft_plc/src/configs/network_config.dart';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/services.dart';
@@ -9,6 +12,7 @@ class NetworkPropertyHandler {
   final NetworkConfig _config;
   final IErrorLogger _errorLogger;
   final INetworkService _networkService;
+  final _publickMessageBuffer = Queue<(String, SmartBuffer)>();
 
   bool _run = false;
   late final CancelableFutureDelayed _reconnectDalay;
@@ -32,22 +36,39 @@ class NetworkPropertyHandler {
         await _networkService.connect();
         _subscribe();
         _listenTopicks();
+        _publicationFromBuffer();
         await _publishing();
         break;
       } catch (e, s) {
         _errorLogger.log(e, s);
-        await _reconnectDalay.call();
+        await _reconnectDalay();
       }
     }
   }
 
   void publication(String topic, SmartBuffer value) {
-    _networkService.publication(topic, value);
+    if (_networkService.isConnected()) {
+      _networkService.publication(topic, value);
+    }
+
+    _publickMessageBuffer.add((topic, value));
+  }
+
+  void cancel() {
+    _run = false;
+    _reconnectDalay.cancel();
+    _publicationDalay.cancel();
+    _networkService.disconnect();
   }
 
   Future<void> _publishing() async {
     while (_networkService.isConnected()) {
-      await _publicationDalay.call();
+
+    if (!_networkService.isConnected()) {
+        throw Exception("Disconnect exception");
+     }
+
+      await _publicationDalay();
 
       try {
         for (var task in _tasks) {
@@ -57,6 +78,9 @@ class NetworkPropertyHandler {
         }
       } catch (e, s) {
         _errorLogger.log(e, s);
+        if (!_networkService.isConnected()) {
+          throw Exception("Disconnect exception");
+        }
       }
     }
   }
@@ -77,10 +101,10 @@ class NetworkPropertyHandler {
     }
   }
 
-  void cancel() {
-    _run = false;
-    _reconnectDalay.cancel();
-    _publicationDalay.cancel();
-    _networkService.disconnect();
+  void _publicationFromBuffer() {
+    while (_publickMessageBuffer.isNotEmpty) {
+      final (topic, value) = _publickMessageBuffer.removeFirst();
+      _networkService.publication(topic, value);
+    }
   }
 }

@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 void main() {
   test('mqtt_simple_test', () async {
     const baseTopic = "/soft-plc/test/mqtt_311/";
-    final client = Mqtt311(NetworkConfig());
+    final client = Mqtt311(TestConf());
     await client.connect();
 
     client.subscribe("$baseTopic#");
@@ -30,4 +30,10 @@ void main() {
 
     await client.disconnect();
   });
+}
+
+
+class TestConf extends NetworkConfig {
+  @override
+  String get host => '127.0.0.1';
 }
