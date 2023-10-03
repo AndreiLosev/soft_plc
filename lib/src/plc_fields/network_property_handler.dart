@@ -64,10 +64,7 @@ class NetworkPropertyHandler {
   void _listenTopicks() {
     _networkService.listen((topic, buffer) {
       for (var task in _tasks) {
-        if (_networkService.topicContains(
-            task.getTopicSubscriptions(), topic)) {
-          task.setNetworkProperty(topic, buffer);
-        }
+        task.setNetworkProperty(topic, buffer);
       }
     });
   }

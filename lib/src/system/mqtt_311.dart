@@ -41,11 +41,6 @@ class Mqtt311 implements INetworkService {
       _client.connectionStatus!.state == MqttConnectionState.connected;
 
   @override
-  bool topicContains(Set<String> topics, String topic) {
-    return topics.contains(topic);
-  }
-
-  @override
   void listen(void Function(String topic, SmartBuffer buffer) onData) {
     _client.updates!.listen((message) {
       final topic = message.first.topic;
