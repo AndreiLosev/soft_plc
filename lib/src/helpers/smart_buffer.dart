@@ -5,7 +5,9 @@ import 'package:typed_data/typed_data.dart';
 
 class SmartBuffer {
   
-    final Uint8Buffer _payload = Uint8Buffer();
+    final Uint8Buffer _payload;
+
+    SmartBuffer([Uint8Buffer? buffer]): _payload = buffer ?? Uint8Buffer();
 
     Uint8Buffer get payload => _payload;
 

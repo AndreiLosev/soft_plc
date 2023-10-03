@@ -1,6 +1,6 @@
 import 'package:mqtt_client/mqtt_client.dart';
 
-class MqttConfig {
+class NetworkConfig {
     String get host => "test.mosquitto.org";
     int get port => 1883;
 
@@ -9,8 +9,8 @@ class MqttConfig {
 
     String get clientIdentifier => 'soft_plc_default_id';
 
-    Duration get keepAlivePeriod => Duration(minutes: 5);
-    Duration get connectTimeoutPeriod => Duration(seconds: 2);
+    Duration get keepAlivePeriod => const Duration(minutes: 5);
+    Duration get connectTimeoutPeriod => const Duration(seconds: 2);
 
     bool get logging => false;
 
@@ -18,6 +18,8 @@ class MqttConfig {
 
     MqttQos get subscriptionQot => MqttQos.atMostOnce;
     MqttQos get publicationQot => MqttQos.atMostOnce;
+
+    Map<String, bool> get publicationRetain => {};
 
     String? get willTopic => null;
     String? get willMessage => null;
@@ -29,5 +31,7 @@ class MqttConfig {
 
     int get numberAttemptsConnect => 3;
 
-    Duration publicationPeriod = Duration(milliseconds: 200);
+    Duration publicationPeriod = const Duration(milliseconds: 200);
+
+    Duration autoReconnectPeriod = const Duration(seconds: 2);
 }

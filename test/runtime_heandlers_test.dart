@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:soft_plc/src/config.dart';
-import 'package:soft_plc/src/configs/mqtt_config.dart';
+import 'package:soft_plc/src/configs/network_config.dart';
 import 'package:soft_plc/src/plc_fields/event_task_collection.dart';
 import 'package:soft_plc/src/plc_fields/event_task_field.dart';
 import 'package:soft_plc/src/plc_fields/logging_property_handler.dart';
@@ -87,7 +87,7 @@ void main() {
         final ptask = OneTask();
         final eloger = ConsoleErrorLogger();
         final equeue = EventQueue(eloger);
-        final config = Config(MqttConfig());
+        final config = Config(NetworkConfig());
         final sc = ServiceContainer();
 
         final handler = MonitoringPropertyHandler([ptask], config, equeue, eloger);

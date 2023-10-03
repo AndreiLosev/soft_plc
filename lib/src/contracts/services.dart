@@ -1,4 +1,5 @@
 import 'package:soft_plc/src/helpers/reatain_value.dart';
+import 'package:soft_plc/src/helpers/smart_buffer.dart';
 
 abstract interface class IReatainService {
 
@@ -38,5 +39,12 @@ abstract interface class IDbConnect {
 }
 
 abstract interface class INetworkService {
-    Future<void> connect<T extends Object>(T param);
+    Future<void> connect();
+    Future<void> disconnect();
+    void subscribe(String topic);
+    bool topicContains(Set<String> topics, String topic);
+    void listen(void Function(String topic, SmartBuffer buffer) onData);
+    void publication(String topic, SmartBuffer buffer);
+    bool isConnected();
+
 }

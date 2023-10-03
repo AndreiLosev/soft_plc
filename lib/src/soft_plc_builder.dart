@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:soft_plc/soft_plc.dart';
-import 'package:soft_plc/src/configs/mqtt_config.dart';
+import 'package:soft_plc/src/configs/network_config.dart';
 import 'package:soft_plc/src/plc_fields/event_task_collection.dart';
 import 'package:soft_plc/src/plc_fields/event_task_field.dart';
 import 'package:soft_plc/src/plc_fields/logging_property_handler.dart';
@@ -10,6 +10,7 @@ import 'package:soft_plc/src/plc_fields/network_property_handler.dart';
 import 'package:soft_plc/src/plc_fields/periodic_task_collection.dart';
 import 'package:soft_plc/src/plc_fields/periodic_task_field.dart';
 import 'package:soft_plc/src/plc_fields/retain_property_heandler.dart';
+import 'package:soft_plc/src/system/mqtt_311.dart';
 import 'package:soft_plc/src/system/sqlite_db_connect.dart';
 
 class SoftPlcBuilder {
@@ -120,13 +121,19 @@ class SoftPlcBuilder {
 
     void _registerDefaultServices() {
 
-        if (!_container.has<MqttConfig>()) {
-            _container.registerSingleton(MqttConfig());
+        if (!_container.has<NetworkConfig>()) {
+            _container.registerSingleton(NetworkConfig());
         }
 
         if (!_container.has<Config>()) {
             _container.registerSingleton<Config>(Config(
-                _container.get<MqttConfig>(),
+                _container.get<NetworkConfig>(),
+            ));
+        }
+
+        if (!_container.has<INetworkService>()) {
+            _container.registerSingleton<INetworkService>(Mqtt311(
+                _container.get<NetworkConfig>()
             ));
         }
 
@@ -180,12 +187,12 @@ class SoftPlcBuilder {
             _networkTask,
             _container.get<Config>().mqttConfig,
             _container.get<IErrorLogger>(),
+            _container.get<INetworkService>(),
         );
 
         await Future.wait([
             _loggingPropertyHandler.build(),
             _monitoringPropertyHandler.build(),
-            _networkPropertyHandler.build(),
             _periodicTaskCollection.build(),
             _eventTaskCollection.build(),
 

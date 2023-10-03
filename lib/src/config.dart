@@ -1,9 +1,9 @@
 import 'package:soft_plc/soft_plc.dart';
-import 'package:soft_plc/src/configs/mqtt_config.dart';
+import 'package:soft_plc/src/configs/network_config.dart';
 
 class Config {
 
-    final MqttConfig mqttConfig;
+    final NetworkConfig mqttConfig;
 
     Config(this.mqttConfig);
     
