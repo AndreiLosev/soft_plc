@@ -21,7 +21,7 @@ class EventQueue {
       try {
         yield await Future(_queue.removeFirst);
       } on StateError {
-        await Future.delayed(Duration(milliseconds: 25));
+        await Future.delayed(Duration(milliseconds: 100));
       } catch (e, s) {
         _errorLogger.log(e, s);
         await Future.delayed(Duration(milliseconds: 50));
