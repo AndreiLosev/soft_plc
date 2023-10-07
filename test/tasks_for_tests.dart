@@ -64,12 +64,24 @@ class OneTask extends PeriodicTask
   }
 }
 
-class TwoTask extends EventTask<TwoEvent> {
+class TwoTask extends EventTask<TwoEvent> implements INetworkSubscriber {
   String val = '0';
 
   @override
   void execute(ServiceContainer container, TwoEvent event) {
     val = "$val ${event.val}";
+  }
+
+  @override
+  Set<String> getTopicSubscriptions() {
+    return {"soft_plc/test/handler_mqtt_test/${addClassName('val')}"};
+  }
+
+  @override
+  void setNetworkProperty(String topic, SmartBuffer value) {
+    if (topic == "soft_plc/test/handler_mqtt_test/${addClassName('val')}") {
+      val = value.getAsString();
+    }
   }
 }
 

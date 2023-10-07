@@ -6,6 +6,7 @@ import 'package:soft_plc/src/configs/network_config.dart';
 import 'package:soft_plc/src/helpers/smart_buffer.dart';
 import 'package:soft_plc/src/plc_fields/network_property_handler.dart';
 import 'package:soft_plc/src/system/console_error_logger.dart';
+import 'package:soft_plc/src/system/event_queue.dart';
 import 'package:soft_plc/src/system/mqtt_311.dart';
 import 'package:test/test.dart';
 
@@ -44,23 +45,33 @@ void main() {
   test('handler mqtt test', () async {
     final task1 = OneTask();
     final task2 = ThreeTask();
+    final task3 = TwoTask();
     final config = TestConf();
+    final eloger = ConsoleErrorLogger();
     final handler = NetworkPropertyHandler(
       [task2],
-      [task1],
+      [task1, task3],
       config,
-      ConsoleErrorLogger(),
+      eloger,
       Mqtt311(config),
     );
 
     handler.run();
 
-    await Future.delayed(Duration(milliseconds: 500));
+    Timer(Duration(milliseconds: 50), () {
+      handler.publication(
+        "soft_plc/test/handler_mqtt_test/${task3.addClassName('val')}",
+        SmartBuffer()..addString('wasa'),
+      );
+    });
+
+    await Future.delayed(Duration(milliseconds: 200));
 
     handler.cancel();
 
     expect(task1.x1, 11);
     expect(task1.x2.toString(), "9.88");
+    expect(task3.val, 'wasa');
 
   });
 

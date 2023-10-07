@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:mqtt_client/mqtt_client.dart';
 import 'package:soft_plc/src/configs/network_config.dart';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/services.dart';
