@@ -13,9 +13,16 @@ class CancelableFutureDelayed<T> {
     final start = DateTime.now();
     _run = true;
     _execut = true;
-
-    while (DateTime.now().difference(start) < _delay && _run) {
-      await Future.delayed(delay);
+    while (_run) {
+      final diff = DateTime.now().difference(start);
+      if (diff >= _delay) {
+        break;
+      }
+      if ((_delay - diff) < delay) {
+        await Future.delayed(_delay - diff);
+      } else {
+        await Future.delayed(delay);
+      }
     }
 
     return _computation != null && _execut ? _computation!() : Future.value();

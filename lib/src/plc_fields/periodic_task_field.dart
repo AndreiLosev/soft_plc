@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/services.dart';
 import 'package:soft_plc/src/contracts/task.dart';
+import 'package:soft_plc/src/helpers/cancelable_future_delayed.dart';
 import 'package:soft_plc/src/plc_fields/retain_property_heandler.dart';
 import 'package:soft_plc/src/service_container.dart';
 
@@ -12,12 +13,14 @@ class PeriodicTaskField {
   final IErrorLogger _errorLogger;
   DateTime _lastStart = DateTime.now();
   bool _run = false;
+  CancelableFutureDelayed? _delay;
 
   PeriodicTaskField(
     this._task,
     this._retainHeandler,
     this._errorLogger,
   );
+
 
   Future<void> init() async {
     if (_task is IRetainProperty) {
@@ -39,12 +42,14 @@ class PeriodicTaskField {
       } catch (e, s) {
         _errorLogger.log(e, s);
       }
-      await Future.delayed(_getPause());
+      _delay = CancelableFutureDelayed(_getPause());
+      await _delay!();
     }
   }
 
   void cancel() {
     _run = false;
+    _delay?.cancel();
   }
 
   Duration _getPause() {
