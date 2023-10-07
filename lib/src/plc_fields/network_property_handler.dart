@@ -8,7 +8,8 @@ import 'package:soft_plc/src/helpers/cancelable_future_delayed.dart';
 import 'package:soft_plc/src/helpers/smart_buffer.dart';
 
 class NetworkPropertyHandler {
-  final List<INetworkProperty> _tasks;
+  final List<INetworkSubscriber> _tasksSubscriber;
+  final List<INetworkPublisher> _tasksPublisher;
   final NetworkConfig _config;
   final IErrorLogger _errorLogger;
   final INetworkService _networkService;
@@ -19,7 +20,8 @@ class NetworkPropertyHandler {
   late final CancelableFutureDelayed _publicationDalay;
 
   NetworkPropertyHandler(
-    this._tasks,
+    this._tasksPublisher,
+    this._tasksSubscriber,
     this._config,
     this._errorLogger,
     this._networkService,
@@ -71,7 +73,7 @@ class NetworkPropertyHandler {
       await _publicationDalay();
 
       try {
-        for (var task in _tasks) {
+        for (var task in _tasksPublisher) {
           for (var message in task.getPeriodicallyPublishedValues().entries) {
             _networkService.publication(message.key, message.value);
           }
@@ -87,14 +89,14 @@ class NetworkPropertyHandler {
 
   void _listenTopicks() {
     _networkService.listen((topic, buffer) {
-      for (var task in _tasks) {
+      for (var task in _tasksSubscriber) {
         task.setNetworkProperty(topic, buffer);
       }
     });
   }
 
   void _subscribe() {
-    for (var task in _tasks) {
+    for (var task in _tasksSubscriber) {
       for (var topic in task.getTopicSubscriptions()) {
         _networkService.subscribe(topic);
       }

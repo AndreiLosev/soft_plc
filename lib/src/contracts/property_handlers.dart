@@ -13,8 +13,11 @@ abstract interface class IMonitoringProperty {
   List<(Event, Object)> getEventValues();
 }
 
-abstract interface class INetworkProperty {
+abstract interface class INetworkSubscriber {
   Set<String> getTopicSubscriptions();
   void setNetworkProperty(String topic, SmartBuffer value);
+}
+
+abstract interface class INetworkPublisher {
   Map<String, SmartBuffer> getPeriodicallyPublishedValues();
 }

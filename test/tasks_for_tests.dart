@@ -1,10 +1,11 @@
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/task.dart';
 import 'package:soft_plc/src/helpers/reatain_value.dart';
+import 'package:soft_plc/src/helpers/smart_buffer.dart';
 import 'package:soft_plc/src/service_container.dart';
 
 class OneTask extends PeriodicTask
-    implements ILoggingProperty, IRetainProperty, IMonitoringProperty {
+    implements ILoggingProperty, IRetainProperty, IMonitoringProperty, INetworkSubscriber {
   int x1 = 0;
   double x2 = 0.0;
 
@@ -31,6 +32,24 @@ class OneTask extends PeriodicTask
       addClassName('x1'): ReatainNumValue(x1),
       addClassName('x2'): ReatainNumValue(x2),
     };
+  }
+
+  @override
+  Set<String> getTopicSubscriptions() {
+    return {
+      'soft_plc/test/handler_mqtt_test/x1',
+      'soft_plc/test/handler_mqtt_test/x2',
+    };    
+  }
+
+  @override
+  void setNetworkProperty(String topic, SmartBuffer value) {
+    switch (topic) {
+      case 'soft_plc/test/handler_mqtt_test/x1':
+        x1 = value.getAsInt64();
+      case 'soft_plc/test/handler_mqtt_test/x2':
+        x2 = value.getAsDouble();
+    }
   }
 
   @override
@@ -91,7 +110,7 @@ class FifthTask extends EventTask<Event> {
   }
 }
 
-class ThreeTask extends PeriodicTask {
+class ThreeTask extends PeriodicTask implements INetworkPublisher {
   String s = "1";
 
   @override
@@ -100,6 +119,14 @@ class ThreeTask extends PeriodicTask {
   @override
   void execute(ServiceContainer container) {
     s = "1 $s";
+  }
+
+  @override
+  Map<String, SmartBuffer> getPeriodicallyPublishedValues() {
+    return {
+      'soft_plc/test/handler_mqtt_test/x1': SmartBuffer()..addUint64(11),
+      'soft_plc/test/handler_mqtt_test/x2': SmartBuffer()..addDouble(9.88),
+    };
   }
 }
 

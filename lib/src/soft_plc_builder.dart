@@ -18,7 +18,8 @@ class SoftPlcBuilder {
   final List<Task> _tasks = [];
   final List<ILoggingProperty> _loggingTasks = [];
   final List<IMonitoringProperty> _monitorigTask = [];
-  final List<INetworkProperty> _networkTask = [];
+  final List<INetworkPublisher> _networkPublisher = [];
+  final List<INetworkSubscriber> _networkSubscriber = [];
   late final LoggingPropertyHandler _loggingPropertyHandler;
   late final MonitoringPropertyHandler _monitoringPropertyHandler;
   late final NetworkPropertyHandler _networkPropertyHandler;
@@ -83,8 +84,12 @@ class SoftPlcBuilder {
         _monitorigTask.add(t as IMonitoringProperty);
       }
 
-      if (t is INetworkProperty) {
-        _networkTask.add(t as INetworkProperty);
+      if (t is INetworkPublisher) {
+        _networkPublisher.add(t as INetworkPublisher);
+      }
+
+      if (t is INetworkSubscriber) {
+        _networkSubscriber.add(t as INetworkSubscriber);
       }
 
       if (t is PeriodicTask) {
@@ -176,7 +181,8 @@ class SoftPlcBuilder {
     );
 
     _networkPropertyHandler = NetworkPropertyHandler(
-      _networkTask,
+      _networkPublisher,
+      _networkSubscriber,
       _container.get<Config>().mqttConfig,
       _container.get<IErrorLogger>(),
       _container.get<INetworkService>(),
