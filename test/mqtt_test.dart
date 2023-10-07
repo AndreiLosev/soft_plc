@@ -75,6 +75,48 @@ void main() {
 
   });
 
+  test('handler mqtt reconnect test', () async {
+    final task1 = OneTask();
+    final task2 = FifthTask();
+    final task3 = TwoTask();
+    final config = TestConf();
+    final eloger = ConsoleErrorLogger();
+    final handler = NetworkPropertyHandler(
+      [task2],
+      [task1, task3],
+      config,
+      eloger,
+      Mqtt311(config),
+    );
+
+    handler.run();
+
+    handler.publication(
+      'soft_plc/test/handler_mqtt_test/x1',
+      SmartBuffer()..addUint64(555),
+    );
+
+    await Future.delayed(Duration(milliseconds: 100));
+    
+    dockerStop();
+
+    handler.publication(
+      "soft_plc/test/handler_mqtt_test/${task3.addClassName('val')}",
+      SmartBuffer()..addString(task1.x1),
+    );
+
+    dockerStart();
+    
+    task2.sumTwo = 999;
+
+    await Future.delayed(Duration(milliseconds: 500));
+
+    handler.cancel();
+
+    expect(task3.val, '555');
+    expect(task3.val2, '999');
+  });
+
   tearDownAll(() => dockerComposeDown());
 }
 
@@ -84,6 +126,8 @@ class TestConf extends NetworkConfig {
   String get host => '127.0.0.1';
   @override
   Duration get publicationPeriod => Duration(milliseconds: 50);
+  @override
+  Duration get autoReconnectPeriod => Duration(milliseconds: 10);
 }
 
 
@@ -93,6 +137,14 @@ void dockerComposeUp() {
 
 void dockerComposeDown() {
   Process.runSync("docker-compose", ["-f", dockerComposePath(), 'down']);
+}
+
+void dockerStop() {
+  Process.runSync('docker', ['stop', 'mqtt-test']);
+}
+
+void dockerStart() {
+  Process.runSync('docker', ['start', 'mqtt-test']);
 }
 
 String dockerComposePath() {

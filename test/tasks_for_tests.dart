@@ -66,6 +66,7 @@ class OneTask extends PeriodicTask
 
 class TwoTask extends EventTask<TwoEvent> implements INetworkSubscriber {
   String val = '0';
+  String val2 = "";
 
   @override
   void execute(ServiceContainer container, TwoEvent event) {
@@ -74,13 +75,18 @@ class TwoTask extends EventTask<TwoEvent> implements INetworkSubscriber {
 
   @override
   Set<String> getTopicSubscriptions() {
-    return {"soft_plc/test/handler_mqtt_test/${addClassName('val')}"};
+    return {
+      "soft_plc/test/handler_mqtt_test/${addClassName('val')}",
+      "soft_plc/test/handler_mqtt_test/${addClassName('val2')}"
+    };
   }
 
   @override
   void setNetworkProperty(String topic, SmartBuffer value) {
     if (topic == "soft_plc/test/handler_mqtt_test/${addClassName('val')}") {
       val = value.getAsString();
+    } else if (topic == "soft_plc/test/handler_mqtt_test/${addClassName('val2')}") {
+      val2 = value.getAsString();
     }
   }
 }
@@ -100,7 +106,7 @@ class FourthEvent extends Event {
   FourthEvent(this.list);
 }
 
-class FifthTask extends EventTask<Event> {
+class FifthTask extends EventTask<Event> implements INetworkPublisher {
   int sumTwo = 0;
   int sumFourth = 0;
   int product = 0;
@@ -119,6 +125,13 @@ class FifthTask extends EventTask<Event> {
     }
 
     product = sumTwo * sumFourth;
+  }
+
+  @override
+  Map<String, SmartBuffer> getPeriodicallyPublishedValues() {
+    return {
+      "soft_plc/test/handler_mqtt_test/TwoTask:val2": SmartBuffer()..addString(sumTwo),
+    };
   }
 }
 

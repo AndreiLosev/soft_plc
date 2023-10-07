@@ -37,8 +37,9 @@ class Mqtt311 implements INetworkService {
   }
 
   @override
-  bool isConnected() =>
-      _client.connectionStatus!.state == MqttConnectionState.connected;
+  bool isConnected() {
+    return _client.connectionStatus!.state == MqttConnectionState.connected;
+  }
 
   @override
   void listen(void Function(String topic, SmartBuffer buffer) onData) {

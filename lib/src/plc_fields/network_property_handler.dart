@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:collection';
 
+import 'package:mqtt_client/mqtt_client.dart';
 import 'package:soft_plc/src/configs/network_config.dart';
 import 'package:soft_plc/src/contracts/property_handlers.dart';
 import 'package:soft_plc/src/contracts/services.dart';
@@ -37,9 +39,8 @@ class NetworkPropertyHandler {
         await _networkService.connect();
         _subscribe();
         _listenTopicks();
-        _publicationFromBuffer();
-        await _publishing();
-        break;
+        await Future.wait([_publicationFromQueue(), _publishingPeriodic()]);
+        await _reconnectDalay();
       } catch (e, s) {
         _errorLogger.log(e, s);
         await _reconnectDalay();
@@ -48,10 +49,6 @@ class NetworkPropertyHandler {
   }
 
   void publication(String topic, SmartBuffer value) {
-    if (_networkService.isConnected()) {
-      _networkService.publication(topic, value);
-    }
-
     _publickMessageBuffer.add((topic, value));
   }
 
@@ -62,14 +59,8 @@ class NetworkPropertyHandler {
     _networkService.disconnect();
   }
 
-  Future<void> _publishing() async {
+  Future<void> _publishingPeriodic() async {
     while (_networkService.isConnected()) {
-
-    if (!_networkService.isConnected()) {
-        throw Exception("Disconnect exception");
-     }
-
-      await _publicationDalay();
 
       try {
         for (var task in _tasksPublisher) {
@@ -77,12 +68,12 @@ class NetworkPropertyHandler {
             _networkService.publication(message.key, message.value);
           }
         }
-      } catch (e, s) {
-        _errorLogger.log(e, s);
-        if (!_networkService.isConnected()) {
-          throw Exception("Disconnect exception");
-        }
+      } on ConnectionException {
+
+        return;
       }
+
+      await _publicationDalay();
     }
   }
 
@@ -102,10 +93,29 @@ class NetworkPropertyHandler {
     }
   }
 
-  void _publicationFromBuffer() {
-    while (_publickMessageBuffer.isNotEmpty) {
-      final (topic, value) = _publickMessageBuffer.removeFirst();
-      _networkService.publication(topic, value);
+  Future<void> _publicationFromQueue() async {
+    while (_networkService.isConnected()) {
+      
+      String? topic;
+      SmartBuffer? message;
+
+      try {
+
+        (topic, message) = _publickMessageBuffer.removeFirst();
+        await Future(() => _networkService.publication(topic!, message!)); 
+
+      } on StateError {
+
+        await Future.delayed(Duration(milliseconds: 100));
+
+      } on ConnectionException {
+
+        if (topic is String && message is SmartBuffer) {
+          _publickMessageBuffer.add((topic, message));
+        }
+        _publicationDalay.cancel();
+        return;
+      }
     }
   }
 }
