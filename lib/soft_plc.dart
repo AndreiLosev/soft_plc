@@ -1,5 +1,6 @@
 library soft_plc;
 
+export 'src/annotation.dart';
 export 'src/soft_plc.dart';
 export 'src/soft_plc_builder.dart';
 export 'src/helpers/system_tasks.dart';
