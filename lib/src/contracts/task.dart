@@ -17,7 +17,7 @@ abstract class EventTask<T extends Event> extends Task {
 abstract class ListeningTask extends Task {
   Future<void> execute(
     ServiceContainer container,
-    void Function() notification,
+    void Function() saveRetain,
   );
 }
 
