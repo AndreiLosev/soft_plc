@@ -67,10 +67,16 @@ class OneTask extends PeriodicTask
 class TwoTask extends EventTask<TwoEvent> implements INetworkSubscriber {
   String val = '0';
   String val2 = "";
+  late TwoEvent _e;
 
   @override
-  void execute(ServiceContainer container, TwoEvent event) {
-    val = "$val ${event.val}";
+  set event(TwoEvent event) {
+    _e = event;
+  }
+
+  @override
+  void execute(ServiceContainer container) {
+    val = "$val ${_e.val}";
   }
 
   @override
@@ -93,10 +99,16 @@ class TwoTask extends EventTask<TwoEvent> implements INetworkSubscriber {
 
 class FourthTask extends EventTask<FourthEvent> {
   int sum = 0;
+  late FourthEvent _e;
 
   @override
-  void execute(ServiceContainer container, FourthEvent event) {
-    sum += event.list.reduce((v, e) => v + e);
+  set event(FourthEvent event) {
+    _e = event;
+  }
+
+  @override
+  void execute(ServiceContainer container) {
+    sum += _e.list.reduce((v, e) => v + e);
   }
 }
 
@@ -110,18 +122,26 @@ class FifthTask extends EventTask<Event> implements INetworkPublisher {
   int sumTwo = 0;
   int sumFourth = 0;
   int product = 0;
+  late Event _e;
 
   @override
   Set<Type> get eventSubscriptions => {FourthEvent, TwoEvent};
 
+  
+
   @override
-  void execute(ServiceContainer container, Event event) {
-    if (event is TwoEvent) {
-      sumTwo += event.val;
+  set event(Event event) {
+    _e = event;
+  }
+
+  @override
+  void execute(ServiceContainer container) {
+    if (_e is TwoEvent) {
+      sumTwo += (_e as TwoEvent).val;
     }
 
-    if (event is FourthEvent) {
-      sumFourth += event.list.reduce((v, e) => v + e);
+    if (_e is FourthEvent) {
+      sumFourth += (_e as FourthEvent).list.reduce((v, e) => v + e);
     }
 
     product = sumTwo * sumFourth;

@@ -29,7 +29,8 @@ class EventTaskField {
 
   Future<void> run(ServiceContainer container, Event event) async {
     try {
-      _task.execute(container, event);
+      _task.event = event;
+      _task.execute(container);
 
       if (_task is IRetainProperty) {
         await _retainHeandler.save(_task as IRetainProperty);

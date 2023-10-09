@@ -4,11 +4,19 @@ import 'package:soft_plc/src/plc_fields/network_property_handler.dart';
 import 'package:soft_plc/src/service_container.dart';
 
 class PublishMessageTask extends EventTask<PublishNetwokMessage> {
+
+  late PublishNetwokMessage e;
+
   @override
-  void execute(ServiceContainer container, PublishNetwokMessage event) {
+  set event(PublishNetwokMessage event) {
+    e = event;
+  }
+
+  @override
+  void execute(ServiceContainer container) {
     container.get<NetworkPropertyHandler>().publication(
-          event.topic,
-          event.message,
+          e.topic,
+          e.message,
         );
   }
 }
