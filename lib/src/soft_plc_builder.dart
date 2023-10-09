@@ -15,7 +15,7 @@ import 'package:soft_plc/src/system/sqlite_db_connect.dart';
 
 class SoftPlcBuilder {
   final ServiceContainer _container = ServiceContainer();
-  final List<Task> _tasks = [];
+  final List<AbstractTask> _tasks = [];
   final List<ILoggingProperty> _loggingTasks = [];
   final List<IMonitoringProperty> _monitorigTask = [];
   final List<INetworkPublisher> _networkPublisher = [];
@@ -26,7 +26,7 @@ class SoftPlcBuilder {
   late final PeriodicTaskCollection _periodicTaskCollection;
   late final EventTaskCollection _eventTaskCollection;
 
-  void registerTask<T extends Task>(T task) {
+  void registerTask<T extends AbstractTask>(T task) {
     _tasks.add(task);
     _container.registerSingleton(() => task);
   }

@@ -1,20 +1,20 @@
 import 'package:soft_plc/src/service_container.dart';
 
-abstract class Task {
+abstract class AbstractTask {
   String addClassName(String name) => "${runtimeType.toString()}:$name";
   void execute(ServiceContainer container);
 }
 
-abstract class PeriodicTask extends Task {
+abstract class PeriodicTask extends AbstractTask {
   Duration get period;
 }
 
-abstract class EventTask<T extends Event> extends Task {
+abstract class EventTask<T extends Event> extends AbstractTask {
   Set<Type> get eventSubscriptions => {T};
   set event(T event);
 }
 
-abstract class ListeningTask extends Task {
+abstract class ListeningTask extends AbstractTask {
 
   late void Function() saveRetain;
 }

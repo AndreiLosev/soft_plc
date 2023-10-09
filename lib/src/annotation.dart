@@ -4,18 +4,8 @@ class Debug {
   const Debug();
 }
 
-class PeriodicTaskAn {
-  final Duration period;
-  final Duration Function()? overridePeriod;
-
-  const PeriodicTaskAn(this.period, [this.overridePeriod]);
-}
-
-class EventTaskAn<T extends Event> {
-  final T event;
-  final Set<Event>? overrideEventSubscriptions;
-
-  const EventTaskAn(this.event, [this.overrideEventSubscriptions]);
+class Task {
+  const Task();
 }
 
 class Retain {
