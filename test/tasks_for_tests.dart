@@ -127,8 +127,6 @@ class FifthTask extends EventTask<Event> implements INetworkPublisher {
   @override
   Set<Type> get eventSubscriptions => {FourthEvent, TwoEvent};
 
-  
-
   @override
   set event(Event event) {
     _e = event;
