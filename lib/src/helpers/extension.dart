@@ -1,7 +1,16 @@
+import 'dart:convert';
+
 extension ObjectDebug on Object {
-  String getDebugValue() {
-    return toString();
+  Object getDebugValue() {
+    return switch (runtimeType) {
+      bool || int || String || double => this,
+      _ => jsonEncode(this, toEncodable: _fn),
+    };
   }
 
   void setDebugValue(String name, Object? value) {}
+}
+
+Object? _fn(Object? obj) {
+  return obj.toString();
 }
