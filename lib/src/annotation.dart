@@ -1,4 +1,4 @@
-import 'package:soft_plc/src/contracts/task.dart';
+import 'package:soft_plc/src/helpers/smart_buffer.dart';
 
 class Debug {
   const Debug();
@@ -17,13 +17,23 @@ class Logging {
 }
 
 class Monitoring {
-  const Monitoring(Event e);
+  final Type eventType;
+  final String? eventFactory;
+  const Monitoring(this.eventType, [this.eventFactory]);
 }
 
 class NetworkSubscriber {
-  const NetworkSubscriber(String topic);
+  final String topic;
+  final BinType? type;
+  final String? factory;
+  final bool bigEndian;
+  const NetworkSubscriber(this.topic, {this.type, this.factory, this.bigEndian = false});
 }
 
 class NetworkPublisher {
-  const NetworkPublisher(String topic);
+  final String topic;
+  final BinType? type;
+  final String? factory;
+  final bool bigEndian;
+  const NetworkPublisher(this.topic, {this.type, this.factory, this.bigEndian = false});
 }

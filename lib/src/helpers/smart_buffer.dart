@@ -144,3 +144,18 @@ class SmartBuffer {
     return bytes;
   }
 }
+
+enum BinType {
+  bool,
+  uInt8,
+  uInt16,
+  uInt32,
+  uInt64,
+  int8,
+  int16,
+  int32,
+  int64,
+  float,
+  double,
+  string,
+}
