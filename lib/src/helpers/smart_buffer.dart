@@ -147,10 +147,10 @@ class SmartBuffer {
 
 enum BinType {
   bool,
-  uInt8,
-  uInt16,
-  uInt32,
-  uInt64,
+  uint8,
+  uint16,
+  uint32,
+  uint64,
   int8,
   int16,
   int32,

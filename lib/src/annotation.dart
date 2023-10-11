@@ -18,8 +18,9 @@ class Logging {
 
 class Monitoring {
   final Type eventType;
+  final List<String>? eventParams;
   final String? eventFactory;
-  const Monitoring(this.eventType, [this.eventFactory]);
+  const Monitoring(this.eventType, {this.eventParams, this.eventFactory});
 }
 
 class NetworkSubscriber {
