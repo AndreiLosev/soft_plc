@@ -9,7 +9,8 @@ class Task {
 }
 
 class Retain {
-  const Retain();
+  final Type? reatainValueType;
+  const Retain([this.reatainValueType]);
 }
 
 class Logging {
