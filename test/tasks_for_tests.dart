@@ -59,8 +59,16 @@ class OneTask extends PeriodicTask
   }
 
   @override
-  List<(Event, Object)> getEventValues() {
-    return [(TwoEvent(x1), x1)];
+  List<(String, Object)> getEventValues() {
+    return [('xfghjkl', x1)];
+  }
+
+  @override
+  Event getEventById(String id) {
+    return switch (id) {
+      'xfghjkl' => TwoEvent(x1),
+      _ => TwoEvent(55555),
+    };
   }
 }
 

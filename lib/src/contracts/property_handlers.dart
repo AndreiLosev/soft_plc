@@ -10,7 +10,8 @@ abstract interface class ILoggingProperty {
 }
 
 abstract interface class IMonitoringProperty {
-  List<(Event, Object)> getEventValues();
+  List<(String, Object)> getEventValues();
+  Event getEventById(String id);
 }
 
 abstract interface class INetworkSubscriber {

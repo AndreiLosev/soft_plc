@@ -10,7 +10,7 @@ class MonitoringPropertyHandler {
   final EventQueue _eventQueue;
   final IErrorLogger _errorLogger;
   bool _run = false;
-  final Map<String, Object> _oldValues = {};
+  final _oldValues = <String, Object>{};
 
   MonitoringPropertyHandler(
     this._tasks,
@@ -20,8 +20,8 @@ class MonitoringPropertyHandler {
   );
 
   Future<void> build() async {
-    await for (final (event, value, id) in _enumeration()) {
-      _oldValues[_getKey(event, id)] = value;
+    await for (final (id, value, _) in _enumeration()) {
+      _oldValues[id] = value;
     }
   }
 
@@ -29,8 +29,8 @@ class MonitoringPropertyHandler {
     _run = true;
 
     while (_run) {
-      await for (final (event, value, id) in _enumeration()) {
-        await _runOne(event, value, id);
+      await for (final (id, value, task) in _enumeration()) {
+        await _runOne(id, value, task);
       }
       await Future.delayed(Duration.zero);
     }
@@ -40,21 +40,19 @@ class MonitoringPropertyHandler {
     _run = false;
   }
 
-  Stream<(Event, Object, int)> _enumeration() async* {
-    int id = 0;
+  Stream<(String, Object, IMonitoringProperty)> _enumeration() async* {
     for (final t in _tasks) {
       for (final item in t.getEventValues()) {
-        id += 1;
-        yield (item.$1, item.$2, id);
+        yield (item.$1, item.$2, t);
       }
     }
   }
 
-  Future<void> _runOne(Event event, Object value, int id) async {
+  Future<void> _runOne(String id, Object value, IMonitoringProperty task) async {
     try {
-      if (_valueIsChanged(_getKey(event, id), value)) {
-        _eventQueue.dispatch(event);
-        _oldValues[_getKey(event, id)] = value;
+      if (_valueIsChanged(id, value)) {
+        _eventQueue.dispatch(task.getEventById(id));
+        _oldValues[id] = value;
       }
     } catch (e, s) {
       _errorLogger.log(e, s);
@@ -75,6 +73,4 @@ class MonitoringPropertyHandler {
 
     return !(oldValue == value);
   }
-
-  String _getKey(Event event, int id) => "${event.runtimeType}_$id";
 }
