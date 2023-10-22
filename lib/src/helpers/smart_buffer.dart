@@ -75,6 +75,24 @@ class SmartBuffer {
     return decoder.convert(slice);
   }
 
+  num getAsNumString([int? length]) {
+      final slice = _sliceFromBuffer(length, false);
+      const decoder = Utf8Decoder();
+      return num.parse(decoder.convert(slice));
+  }
+
+  bool getAsBoolString([int? length]) {
+      final slice = _sliceFromBuffer(length, false);
+      const decoder = Utf8Decoder();
+      return bool.parse(decoder.convert(slice));
+  }
+
+  T getAsJsonString<T>([int? length]) {
+      final slice = _sliceFromBuffer(length, false);
+      const decoder = Utf8Decoder();
+      return jsonDecode(decoder.convert(slice)) as T;
+  }
+
   int getAsUint64([bool bigEndian = false]) {
     final slice = _sliceFromBuffer(8, bigEndian);
     return Uint8List.fromList(slice).buffer.asUint64List().first;
@@ -158,4 +176,7 @@ enum BinType {
   float,
   double,
   string,
+  numFromString,
+  boolFromString,
+  fromJsonString,
 }
